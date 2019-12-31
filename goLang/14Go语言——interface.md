@@ -83,7 +83,7 @@ func main() {
 
 `value, ok := x.(T)`  x ：代表要判断的变量,T ：代表被判断的类型,value：代表返回的值,ok：代表是否为该类型。即：ok partern方式。
 
-不过我们一般用switch进行判断，叫做 type switch。注意：不支持fallthrough.
+不过我们一般用switch进行判断，叫做 type switch。注意：**不支持fallthrough**.
 
 ```go
 func main() {
@@ -105,7 +105,7 @@ func main() {
 
 ## 3.5 接口转换
 
-可以将拥有超集的接口转换为子集的接口。
+**可以将拥有超集的接口转换为子集的接口，反之出错**。
 
 ```go
 type User struct {
@@ -157,7 +157,7 @@ user 1, Tom
 
 ## 4.1 接口值
 
-接口值可以使用 == 和 !＝来进行比较。两个接口值相等仅当它们都是nil值或者它们的动态类型相同并且动态值也根据这个动态类型的＝＝操作相等。因为接口值是可比较的，所以它们可以用在map的键或者作为switch语句的操作数。
+接口值可以使用 == 和 !＝来进行比较。两个接口值相等仅当它们都是nil值或者它们的动态类型相同，并且动态值也根据这个动态类型的==操作相等。因为接口值是可比较的，所以它们可以用在map的键或者作为switch语句的操作数。
 然而，如果两个接口值的动态类型相同，但是这个动态类型是不可比较的（比如切片） ，将它们进行比较就会失败并且panic。
 
 那么接口值内部到底是什么结构呢？
@@ -167,22 +167,23 @@ user 1, Tom
 ```go
 // 没有方法的interface
 type eface struct {
-    _type *_type
-    data  unsafe.Pointer
+    _type *_type   //类型信息
+    data  unsafe.Pointer  //数据指针
 }
 
-// 记录着Go语言中某个数据类型的基本特征
+// 记录着Go语言中某个数据类型的基本特征，_type是go所有类型的公共描述
+//可以简单的认为，接口可以通过一个  _type *_type 直接或间接表述go所有的类型就可以了
 type _type struct {
-    size       uintptr
-    ptrdata    uintptr
-    hash       uint32
-    tflag      tflag
-    align      uint8
-    fieldalign uint8
-    kind       uint8
-    alg        *typeAlg
-    gcdata    *byte
-    str       nameOff
+    size       uintptr	//类型的大小
+    ptrdata    uintptr	//存储所有指针的内存前缀的大小
+    hash       uint32	//类型的hash
+    tflag      tflag	//类型的tags
+    align      uint8	//结构体内对齐
+    fieldalign uint8	//结构体作为field时的对齐
+    kind       uint8	//类型编号 定义于 runtime/typekind.go
+    alg        *typeAlg	// 类型元方法 存储hash 和equal两个操作。
+    gcdata    *byte		//GC 相关信息
+    str       nameOff	//类型名字的偏移
     ptrToThis typeOff
 }
 
@@ -193,14 +194,14 @@ type iface struct {
 }
 
 type itab struct {
-    inter  *interfacetype
-    _type  *_type
+    inter  *interfacetype	//接口定义的类型信息
+    _type  *_type			//接口实际指向值的类型信息
     link   *itab
     hash   uint32
     bad    bool
     inhash bool
     unused [2]byte
-    fun    [1]uintptr
+    fun    [1]uintptr		//接口方法实现列表，即函数地址列表，按字典序排序
 }
 
 // interface数据类型对应的type
@@ -211,13 +212,21 @@ type interfacetype struct {
 }
 ```
 
+存在两种interface，一种是带有方法的interface，一种是不带方法的interface。
+
+对于不带方法的接口类型，Go语言中的所有变量都可以赋值给interface{}变量，interface可以表述go所有的类型，_type存储类型信息，data存储类型的值的指针，指向实际值或者实际值的拷贝。
+
+对于带方法的接口类型，`tab  *itab`  存储指向了iTable的指针，ITable存储了类型相关的信息以及相关方法集，而data 同样存储了实例值的指针，指向实际值或者是实际值的一个拷贝。
+
+ 实现了interface中定义方法的变量可以赋值给带方法的interface变量，并且可以通过interface直接调用对应的方法，实现了其它面向对象语言的多态的概念。
+
 go语言interface的源码表示，接口其实是一个两个字段长度的数据结构。所以任何一个interface变量都是占用16个byte的内存空间。从大的方面来说，如图：
 
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20190310221415491.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTExMzgxOTA=,size_16,color_FFFFFF,t_70)
 
 
 
-`var n notifier     n=user("Bill")` 将一个实现了notifier接口实例user赋给变量n。那我们先来看有方法的接口的内部是怎么样的。接口n 内部两个字段    tab  *itab 和 data unsafe.Pointer， 第一个字段存储的是指向ITable(j接口表)的指针，这个内部表包括已经存储值得类型和与这个值相关联的一组方法。第二个字段存储的是，指向所存储值的指针。**注意：这里是将一个值传递给数组，并非指针，那么就会先将值拷贝一份，开辟内存空间存储，然后将此内存地址赋给接口的data字段。也就是说，值传递时，接口存储的值的指针其实是指向一个副本。**
+`var n notifier     n=user("Bill")` 将一个实现了notifier接口实例user赋给变量n。那我们先来看有方法的接口的内部是怎么样的。接口n 内部两个字段    tab  *itab 和 data unsafe.Pointer， 第一个字段存储的是指向ITable(接口表)的指针，这个内部表包括已经存储值的类型和与这个值相关联的一组方法。第二个字段存储的是，指向所存储值的指针。**注意：这里是将一个值赋值给接口，并非指针，那么就会先将值拷贝一份，开辟内存空间存储，然后将此内存地址赋给接口的data字段。也就是说，值传递时，接口存储的值的指针其实是指向一个副本。**
 
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/2019031022411252.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTExMzgxOTA=,size_16,color_FFFFFF,t_70)
 
@@ -239,7 +248,7 @@ go语言interface的源码表示，接口其实是一个两个字段长度的数
 
 ## 5.1 方法集定义
 
-方法集：方法集定义了一组关联到给定类型的值或者指针的方法。定义方法时使用的接受者的类型决定了这个方法时关联到值，还是关联到指针，还是两个都关联。
+方法集：方法集定义了一组关联到给定类型的值或者指针的方法。定义方法时使用的接受者的类型决定了这个方法是关联到值，还是关联到指针，还是两个都关联。
 
 ```go
 // 这个示例程序展示 Go 语言里如何使用接口
@@ -285,7 +294,7 @@ go语言interface的源码表示，接口其实是一个两个字段长度的数
  }
 ```
 
-如上面代码，当为struct实现接口的方法notify()方法时，定义的接受者receiver是一个指针类型，所以，它要遵循方法集的规则，**如果方法集的receiver 是*T  即指针类型，那么属于接口的值必须同样是 *T  指针类型。**
+如上面代码，当为struct实现接口的方法notify()方法时，定义的接受者receiver是一个指针类型，所以，它要遵循方法集的规则，**如果方法集的receiver 是\*T  即指针类型，那么属于接口的值必须同样是\*T  指针类型。**
 
 user 实现了notify 方法，也就是它实现了notifier 接口，当时如果将user 实例传给notifier实例，必须是一个指针类型，因为它实现的方法的receiver是一个指针类型。所以方法集的作用也就是规范接口的实现。
 
@@ -309,9 +318,11 @@ Methods Receivers  		Values
 
 如果方法的接受者是 值类型，那么用值接收者实现接口，那个类型的值和指针都能够实现对应的接口。
 
-简单讲就是，**接受者是（t T）,那么T 和 *T 都可以实现接口，如果接受者是（t *T）那么只有 *T才算实现接口。**
+简单讲就是，**接受者是（t T）,那么T 和 \*T 都可以实现接口，如果接受者是（t \*T）那么只有 \*T才算实现接口。**
 
 反过来看稍微复杂点，判断这个类型变量是否实现了接口，看一下他是值类型还是指针类型，如果是T 值类型，那就看它实现接口方法的receiver是什么类型，如果也是值类型，那么它就实现了接口，如果不是，就没有实现，就不能进行传递。如果他是指针类型，那么不管它的receiver是值还是指针都实现了接口。所以记住上面的图就好。
+
+**原因：编译器并不是总能自动获得一个值的地址 。**
 
 # 6、嵌入类型时接口实现
 
@@ -375,8 +386,7 @@ func main() {
 
 ```
 
-- 注意声明字段和嵌入类型在语法上的不同 ，嵌入类型直接是写个类型名就行
-- 内部类型的标识符提升到了外部类型，可以直接通过外部类型的值来访问内部类型的标识符。 也可以通过内部类型的名间接访问内部类型方法和标识符。
+
 
 **总之：嵌入类型，就是外部类型拥有内部类型所有的字段和方法，就好比直接定义在外部类型一样。就像继承。**
 
@@ -438,7 +448,7 @@ func sendNotification(n notifier) {
 
 ```
 
-**由于内部类型的提升，内部类型实现的接口会自动提升到外部类型，即外部类型同样也实现了该接口。不过要注意的是方法集的规则。内部类型实现接口外部类型默认也实现了该接口。**
+**由于内部类型的提升，内部类型实现的接口会自动提升到外部类型，即外部类型同样也实现了该接口。不过要注意的是方法集的规则。总结：内部类型实现接口外部类型默认也实现了该接口。**
 
 ## 6.3 内部类型和外部类型同时实现接口
 

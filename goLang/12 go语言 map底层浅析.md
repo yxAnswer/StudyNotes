@@ -28,7 +28,7 @@ type hmap struct {
 	count     int // map的大小.  len()函数就取的这个值
 	flags     uint8 //map状态标识
     B         uint8  // 可以最多容纳 6.5 * 2 ^ B 个元素，6.5为装载因子即:map长度=6.5*2^B
-    				//B可以理解为已扩容的次数
+    				//B可以理解为buckets已扩容的次数
 	noverflow uint16 // 溢出buckets的数量
 	hash0     uint32 // hash 种子
 
@@ -39,7 +39,7 @@ type hmap struct {
 }
 ```
 
-hmap是map的最外层的一个数据结构，包括了map的各种基础信息、如大小、bucket。首先说一下，buckets这个参数，它存储的是指向buckets数组的一个指针，当bucket(桶为0时)为nil。**我们可以理解为，hmap指向了一个bucket数组**，并且当bucket数组需要扩容时，它会开辟一倍的内存空间，并且hi渐进式的把原数组拷贝，即用到旧数组的时候就拷贝到新数组。
+hmap是map的最外层的一个数据结构，包括了map的各种基础信息、如大小、bucket。首先说一下，buckets这个参数，它存储的是指向buckets数组的一个指针，当bucket(桶为0时)为nil。**我们可以理解为，hmap指向了一个空bucket数组**，并且当bucket数组需要扩容时，它会开辟一倍的内存空间，并且会渐进式的把原数组拷贝，即用到旧数组的时候就拷贝到新数组。
 
 ## 2.2 bmap(a  bucket of map)
 
@@ -49,7 +49,7 @@ type bmap struct {
 	// 每个元素hash值的高8位，如果tophash[0] < minTopHash，表示这个桶的搬迁状态
 	tophash [bucketCnt]uint8
   // 第二个是8个key、8个value，但是我们不能直接看到；为了优化对齐，go采用了key放在一起，value放在一起的存储方式，
-   // 第三个是hash冲突发生时，下一个溢出桶的地址
+   // 第三个是溢出时，下一个溢出桶的地址
 }
 ```
 
@@ -96,7 +96,13 @@ bucket（桶），每一个bucket最多放8个key和value，最后由一个overf
 
   **工作流程**：
 
-  查找或者操作map时，首先key经过hash函数生成hash值，通过哈希值的低8位来判断当前数据属于哪个桶(bucket)，找到bucket以后，通过哈希值的高八位与bucket存储的高位哈希值循环比对，如果相同就将完整的哈希值和刚才找到的底层数组的key值进行比对，如果相同，取出value。
+  查找或者操作map时，首先key经过hash函数生成hash值，通过哈希值的低8位来判断当前数据属于哪个桶(bucket)，找到bucket以后，通过哈希值的高八位与bucket存储的高位哈希值循环比对，如果相同就比较刚才找到的底层数组的key值，如果key相同，取出value。如果高八位hash值在此bucket没有，或者有，但是key不相同，就去链表中下一个溢出bucket中查找，直到查找到链表的末尾。
+  
+  碰撞冲突：如果不同的key定位到了统一bucket或者生成了同一hash,就产生冲突。 go是通过链表法来解决冲突的。比如一个高八位的hash值和已经存入的hash值相同，并且此bucket存的8个键值对已经满了，或者后面已经挂了好几个bucket了。那么这时候要存这个值就先比对key,key肯定不相同啊，那就从此位置一直沿着链表往后找，找到一个空位置，存入它。所以这种情况，两个相同的hash值高8位是存在不同bucket中的。
+  
+  查的时候也是比对hash值和key 沿着链表把它查出来。  还有一种情况，就是目前就 1个bucket，并且8个key-value的数组还没有存满，这个时候再比较完key不相同的时候，同样是沿着当前bucket数组中的内存空间往后找，找到第一个空位，插入它。这个就相当于是用寻址法来解决冲突，查找的时候，也是先比较hash值，再比较key,然后沿着当前内存地址往后找。 
+  
+  go语言的map通过数组+链表的方式实现了hash表，同时分散各个桶，使用链表法+bucket内部的寻址法解决了碰撞冲突，也提高了效率。因为即使链表很长了，go会根据装载因子，去扩容整个bucket数组，所以下面就要看下扩容。
 
 #  4、map的扩容
 
@@ -112,11 +118,9 @@ bucket（桶），每一个bucket最多放8个key和value，最后由一个overf
 5.2 Golang map 的底层实现
 ​	地址：https://www.jianshu.com/p/aa0d4808cbb8
 
+**重点来了，必须看**：非常详细的map源码说明
 
-
-
-
-
+[https://github.com/cch123/golang-notes/blob/master/map.md](https://github.com/cch123/golang-notes/blob/master/map.md)
 
 
 
@@ -126,8 +130,6 @@ bucket（桶），每一个bucket最多放8个key和value，最后由一个overf
 https://www.jianshu.com/p/092d4a746620
 
 https://www.jianshu.com/p/aa0d4808cbb8
-
-https://tiancaiamao.gitbooks.io/go-internals/content/zh/02.3.html
 
 https://blog.csdn.net/i6448038/article/details/82057424
 
