@@ -1,4 +1,4 @@
-[TOC]
+[toc]
 
 # 配置文件
 
@@ -26,21 +26,21 @@ Spring Boot设计了一个非常特别的 PropertySource 顺序，以允许对�
 
 9. Java系统属性（System.getProperties()） 。
 
-10. 操作系统环境变量。
+10. **操作系统环境变量。**
 
 11. RandomValuePropertySource，只包含 random.* 中的属性。
 
-12. **没有打进jar包的Profile-specific应用属性**（ application-{profile}.properties 和YAML变量） 。
+12. **没有打进jar包的Profile-specific应用属性（ application-{profile}.properties 和YAML变量）** 。
 
-13. 打进jar包中的Profile-specific应用属性（ application-{profile}.properties 和YAML变量） 。
+13. **打进jar包中的Profile-specific应用属性（ application-{profile}.properties 和YAML变量） 。**
 
-14. 没有打进jar包的应用配置（ application.properties 和YAML变量） 。
+14. **没有打进jar包的应用配置（ application.properties 和YAML变量） 。**
 
-15. **打进jar包中的应用配置**（ application.properties 和YAML变量） 。
+15. **打进jar包中的应用配置（ application.properties 和YAML变量）** 。
 
-16. @Configuration 类上的 @PropertySource 注解。
+16. **@Configuration 类上的 @PropertySource 注解**。
 
-17. 默认属性（使用 SpringApplication.setDefaultProperties 指定） 。
+17. **默认属性（使用 SpringApplication.setDefaultProperties 指定）** 。
       下面是具体的示例，假设你开发一个使用name属性的 @Component ：
 
    ```
@@ -73,20 +73,20 @@ Spring Boot设计了一个非常特别的 PropertySource 顺序，以允许对�
 
 springboot 启动会扫描以下位置的`application.properties`或者`application.yml`文件作为Spring boot的默认配置文件 
 
-```
-–file:./config/              #也就是resources目录下的config/
-–file:./						# 也就是resources根目录
-–classpath:/config/			# 也就是java代码类根目录 即java/config/
-–classpath:/				# 类路径，也就是java/ 下
+```properties
+–file:./config/              #也就是当前项目根目录下的/config文件夹
+–file:./						# 也就是当前项目的根目录
+–classpath:/config/			# 也就是main/resources/config
+–classpath:/				# 类路径，main/resources  资源文件夹下的根目录
 ```
 
 原文
 
-```
-A /config subdirectory of the current directory   --当前项目目录下的/config目录
-The current directory--当前项目目录下的
-A classpath /config package  -类路径下 /config 目录
-The classpath root  --类路径
+```properties
+A /config subdirectory of the current directory   
+The current directory
+A classpath /config package  
+The classpath root  
 ```
 
 **优先级由高到底**，高优先级的配置会覆盖低优先级的配置；
@@ -95,14 +95,14 @@ The classpath root  --类路径
 
 我们在使用Spring Boot的时候，通常也需要定义一些自己使用的属性，我们可以如下方式直接定义：
 
-```
+```properties
 com.text.name.name=姓名
 com.text.title=Spring Boot标题
 ```
 
 然后通过`@Value("${属性名}")`注解来加载对应的配置属性，具体如下：
 
-```
+```java
 @Component
 public class BlogProperties {
 
@@ -122,7 +122,7 @@ public class BlogProperties {
 
 在`application.properties`中的各个参数之间也可以直接引用来使用，就像下面的设置：
 
-```
+```properties
 web.upload-path=D:/images
 spring.resources.static-locations=classpath:file:${web.upload-path}
 
@@ -134,7 +134,7 @@ spring.resources.static-locations参数引用了上文中定义的web.upload-pat
 
 在一些情况下，有些参数我们需要希望它不是一个固定的值，比如密钥、服务端口等。Spring Boot的属性配置文件中可以通过`${random}`来产生int值、long值或者string字符串，来支持属性的随机值。
 
-```
+```properties
 //随机字符串
 my.secret=${random.value}
 //随机int
@@ -147,7 +147,7 @@ my.number.less.than.ten=${random.int(10)}
 my.number.in.range=${random.int[1024,65536]}
 ```
 
-random.int* 语法是 OPEN value (,max) CLOSE ，此处 OPEN，CLOSE 可以是任何字符，并且 value，max 是整数。如果提供 max ，那么 value 是最小值， max 是最大值（不包含在内） 。 
+random.int* 语法是 OPEN value (,max) CLOSE ，此处` OPEN,CLOSE` 可以是任何字符，并且` value，max `是整数。如果提供 max ，那么 value 是最小值， max 是最大值（不包含在内） 。 就是开闭区间，最大值不包括。
 
 ## 6、通过命令行设置属性值
 
@@ -158,13 +158,16 @@ random.int* 语法是 OPEN value (,max) CLOSE ，此处 OPEN，CLOSE 可以是�
 # 多环境配置
 
 >   SpringApplication 将从以下位置加载 application.properties 文件，并把
-> 它们添加到Spring Environment 中：
+>   它们添加到Spring Environment 中：
 >
-> 1. 当前项目resources目录下的 /config 子目录。
-> 2. 当前项目目录resources。
-> 3. java类路径classpath下的 /config 包。 
-> 4. java类路径classpath根路径（root） 。
->    该列表是按优先级排序的（列表中位置高的路径下定义的属性将覆盖位置低的） 。
+>   –file:./config/              #也就是当前项目根目录下的/config文件夹
+>   –file:./						# 也就是当前项目的根目录
+>   –classpath:/config/			# 也就是main/resources/config
+>   –classpath:/				# 类路径，main/resources  资源文件夹下的根目录
+>
+>   该列表是按优先级排序的（列表中位置高的路径下定义的属性将覆盖位置低的） 。
+
+现在我们主要在resources目录下建三个配置文件测试，当然，也可以在其他地方，优先级不同。
 
 我们在开发Spring Boot应用时，通常同一套程序会被应用和安装到几个不同的环境，比如：开发、测试、生产等。其中每个环境的数据库地址、服务器端口等等配置都会不同，如果在为不同环境打包时都要频繁修改配置文件的话，那必将是个非常繁琐且容易发生错误的事。
 
@@ -204,3 +207,11 @@ random.int* 语法是 OPEN value (,max) CLOSE ，此处 OPEN，CLOSE 可以是�
 
 3、`application-{profile}.properties `配置文件优先于 `application.properties`
 
+4、另外注意文件夹下的读取顺序，同名情况
+
+```prop
+–file:./config/              #也就是当前项目根目录下的/config文件夹
+–file:./						# 也就是当前项目的根目录
+–classpath:/config/			# 也就是main/resources/config
+–classpath:/				# 类路径，main/resources  资源文件夹下的根目录
+```

@@ -1,4 +1,4 @@
-[TOC]
+[toc]
 
 # pageHelper分页插件的使用
 

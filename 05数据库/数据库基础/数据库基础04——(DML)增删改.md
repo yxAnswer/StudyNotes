@@ -1,6 +1,6 @@
 # 数据库基础04——(DML)增删改
 
-[TOC]
+[toc]
 
 ## 1、INSERT
 
@@ -81,9 +81,11 @@ delete from  表名 [where 条件]
 
 删除表中所有记录用delete from 表名；还是用 truncate table  表名？
 
-注意：delete 是一条一条的删除，不清空 auto_increment记录数。
+注意：delete 是一条一条的删除，不亲空 auto_increment记录数。
 
-​	   truncate是直接将整张表删除，重新建表，auto_increment 将重置为0。 所以删除效率更高。
+```
+   truncate是直接将整张表删除，重新建表，auto_increment 将重置为0。 所以删除效率更高。
+```
 
 事务方面：delete 删除的数据，如果在一个事务内是可以找回，但是truncate 删除的数据是不可以找回的。
 

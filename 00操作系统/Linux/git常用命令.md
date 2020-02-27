@@ -30,6 +30,7 @@ $ git add .  # 添加当前目录的所有文件到暂存区
 $ git commit -m [message]  # 提交暂存区到仓库区
 $ git commit [file1] [file2] ... -m [message]  # 提交暂存区的指定文件到仓库区
 $ git rm [file1] [file2] ...	# 删除工作区文件，并且将这次删除放入暂存区
+$ git rm -r [文件夹]  #删除文件夹下所有
 $ git rm --cached [file] 	# 停止追踪指定文件，但该文件会保留在工作区
 ```
 
@@ -152,9 +153,31 @@ $ git push origin :refs/tags/[tagName] # 删除远程tag
 $ git checkout -b [branch] [tag]
 ```
 
+## 8、Git 设置代理
 
+代理格式 `[protocol://][user[:password]@]proxyhost[:port]`
+参考 https://git-scm.com/docs/git-config
 
+设置 HTTP 代理：
 
+```shell
+$git config --global http.proxy http://127.0.0.1:8118
+$git config --global https.proxy http://127.0.0.1:8118
+```
+
+设置 SOCKS5 代理：
+
+```shell
+$git config --global http.proxy socks5://127.0.0.1:1080
+$git config --global https.proxy socks5://127.0.0.1:1080
+```
+
+Git 取消代理设置：
+
+```shell
+$git config --global --unset http.proxy
+$git config --global --unset https.proxy
+```
 
 
 

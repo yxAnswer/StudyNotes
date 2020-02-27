@@ -1,6 +1,6 @@
 # 配置文件介绍
 
-[TOC]
+[toc]
 
 ## 一、springboot 配置文件分类
 - .application.properties

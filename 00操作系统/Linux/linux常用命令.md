@@ -224,13 +224,102 @@ ps -ef :查看当前系统中运行的进程
 
 kill  -进程pid    ,比如 kill -10
 
+```shell
+[root@localhost answer]# kill -l     //有64种方式
+ 1) SIGHUP       2) SIGINT       3) SIGQUIT      4) SIGILL       5) SIGTRAP
+ 6) SIGABRT      7) SIGBUS       8) SIGFPE       9) SIGKILL     10) SIGUSR1
+11) SIGSEGV     12) SIGUSR2     13) SIGPIPE     14) SIGALRM     15) SIGTERM
+16) SIGSTKFLT   17) SIGCHLD     18) SIGCONT     19) SIGSTOP     20) SIGTSTP
+21) SIGTTIN     22) SIGTTOU     23) SIGURG      24) SIGXCPU     25) SIGXFSZ
+26) SIGVTALRM   27) SIGPROF     28) SIGWINCH    29) SIGIO       30) SIGPWR
+31) SIGSYS      34) SIGRTMIN    35) SIGRTMIN+1  36) SIGRTMIN+2  37) SIGRTMIN+3
+38) SIGRTMIN+4  39) SIGRTMIN+5  40) SIGRTMIN+6  41) SIGRTMIN+7  42) SIGRTMIN+8
+43) SIGRTMIN+9  44) SIGRTMIN+10 45) SIGRTMIN+11 46) SIGRTMIN+12 47) SIGRTMIN+13
+48) SIGRTMIN+14 49) SIGRTMIN+15 50) SIGRTMAX-14 51) SIGRTMAX-13 52) SIGRTMAX-12
+53) SIGRTMAX-11 54) SIGRTMAX-10 55) SIGRTMAX-9  56) SIGRTMAX-8  57) SIGRTMAX-7
+58) SIGRTMAX-6  59) SIGRTMAX-5  60) SIGRTMAX-4  61) SIGRTMAX-3  62) SIGRTMAX-2
+63) SIGRTMAX-1  64) SIGRTMAX
+```
+
+常用 `kill -9  pid` 强制杀死
+
+```shell
+1) SIGHUP       终端的控制进程结束，通知session内的各个作业，脱离关系 
+2) SIGINT       程序终止信号（Ctrl+c）
+3) SIGQUIT      和2号信号类似（Ctrl+\），产生core文件
+4) SIGILL       执行了非法指令，可执行文件本身出现错误 
+5) SIGTRAP      有断点指令或其他trap指令产生，有debugger使用
+6) SIGABRT      调用abort函数生成的信号 
+7) SIGBUS       非法地址（内存地址对齐出错）
+8) SIGFPE       致命的算术错误（浮点数运算，溢出，及除数为0 错误）
+9) SIGKILL      用来立即结束程序的运行（不能为阻塞，处理，忽略）
+10) SIGUSR1     用户使用 
+11) SIGSEGV     访问内存错误
+12) SIGUSR2     用户使用
+13) SIGPIPE     管道破裂
+14) SIGALRM     时钟定时信号
+15) SIGTERM     程序结束信号（可被阻塞，处理）
+16) SIGSTKFLT   协处理器栈堆错误
+17) SIGCHLD     子进程结束，父进程收到这个信号并进行处理，（wait也可以）否则僵尸进程
+18) SIGCONT     让一个停止的进程继续执行（不能被阻塞）
+19) SIGSTOP     让一个进程停止执行（不能被阻塞，处理，忽略）
+20) SIGTSTP     停止进程的运行（可以被处理和忽略）
+21) SIGTTIN     当后台作业要从用户终端读数据时, 该作业中的所有进程会收到SIGTTIN信号. 缺省时这些进程会停止执行.
+22) SIGTTOU     类似SIGTTIN,但在写终端时收到
+23) SIGURG      有紧急数据或者out—of—band 数据到达socket时产生
+24) SIGXCPU     超过CPU资源限定，这个限定可改变
+25) SIGXFSZ     当进程企图扩大文件以至于超过文件大小资源限制
+26) SIGVTALRM   虚拟时钟信号（计算的是该进程占用的CPU时间）
+27) SIGPROF     时钟信号（进程用的CPU时间及系统调用时间）
+28) SIGWINCH    窗口大小改变时发出
+29) SIGIO       文件描述符准备就绪，可以进行读写操作
+30) SIGPWR      power failure
+31) SIGSYS      非法的系统调用
+
+```
+
+
+
 ### ifconfig  查看网卡信息
+
+ip addr 也可以查看ip信息
 
 ### ping 查看网络连接情况
 
 ### netstat -an  查看端口占用情况
 
+功能说明：**查看网络端口的使用情况**
+举 例：`netstat -tunlp | grep nginx`
+`-t` ：显示tcp端口
+`-u` ：显示UDP端口
+`-n `：指明拒绝显示别名
+`-l` ：指明listen的
+`-p` ：指明显示建立相关连接的程序名
+安装netstat命令：`yum -y install net-tools  `
 
+### top命令
+
+**功能说明：监控Linux系统状况，比如cpu、内存的使用**
+举 例：按住键盘q退出  
+
+### du命令
+
+**功能说明：统计大小** 
+举 例：du -sh ； du -sm *  
+
+### uniq命令
+
+**功能说明：对排序好的内容进行统计**
+举 例：uniq -c 123.txt | sort -n  
+
+可以查出内容出现次数、并且通过sort 排序
+
+### cal 命令
+
+**功能说明：查看日历**
+举 例：cal 2008   查看2008年日历
+
+cal --help 可以查看cal其他用法
 
 ## 7、linux 下的权限命令
 

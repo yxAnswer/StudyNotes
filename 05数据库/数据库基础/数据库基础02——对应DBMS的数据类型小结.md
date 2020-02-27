@@ -1,6 +1,6 @@
 # 数据库基础02——对应各DBMS的数据类型小结
 
-[TOC]
+[toc]
 
 # 一、MySQL常用数据类型
 
@@ -204,6 +204,3 @@ number 类型例子
 [https://www.yiibai.com/oracle/oracle-interval.html](https://www.yiibai.com/oracle/oracle-interval.html)
 
 [https://docs.oracle.com/cd/B28359_01/server.111/b28318/datatype.htm#CNCPT413](https://docs.oracle.com/cd/B28359_01/server.111/b28318/datatype.htm#CNCPT413)
-
-
-
