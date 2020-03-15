@@ -22,6 +22,10 @@
 
 `tar -xvf jdk-8-linux.gz`  解压完成为 jdk1.8.0_201 这就是我们的jdk
 
+>如果使用secure crt   传输出现 rz命令 提示command not found 解决方法
+>
+>yum -y install lrzsz     先安装传输工具
+
 ### 1.3 配置环境变量
 
 按两种方式设置吧：一个是系统级别，所有用户通用。一个是设置到用户级别。
@@ -32,7 +36,7 @@
 
 `vim profile` 或者直接 `vim /etc/profile`
 
-直接编辑 /etc/profile 文件，然后在文件末尾 添加以下：
+直接编辑 /etc/profile 文件，然后在文件末尾 添加以下： 权限不够的话使用sudo vi /etc/profile
 
 ```
 #set java environment

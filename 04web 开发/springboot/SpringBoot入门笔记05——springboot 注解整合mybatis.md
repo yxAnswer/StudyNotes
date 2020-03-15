@@ -39,12 +39,13 @@
 
 ```xml
 			<!-- 引入starter-->
-					<dependency>
-					    <groupId>org.mybatis.spring.boot</groupId>
-					    <artifactId>mybatis-spring-boot-starter</artifactId>
-					    <version>1.3.2</version>
-					    <scope>runtime</scope>			    
-					</dependency>
+			<!-- https://mvnrepository.com/artifact/org.mybatis.spring.boot/mybatis-spring-boot-starter -->
+            <dependency>
+                <groupId>org.mybatis.spring.boot</groupId>
+                <artifactId>mybatis-spring-boot-starter</artifactId>
+                <version>1.3.2</version>
+            </dependency>
+
 		 			
 		 	<!-- MySQL的JDBC驱动包	-->	
 		 			<dependency>

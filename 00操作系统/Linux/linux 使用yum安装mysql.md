@@ -1,6 +1,7 @@
 # linux 使用yum 安装mysql
 
-@[toc]
+[toc]
+
 ## 1、下载yum安装源
 
 官网：[https://dev.mysql.com/downloads/repo/yum/](https://dev.mysql.com/downloads/repo/yum/)
@@ -18,7 +19,7 @@ rpm -ivh mysql-community-release-el7-5.noarch.rpm
 
 ## 2、修改yum源，设置版本(可选)
 
-yum repository 安装mysql的方式我们是可以选择自己的软件源的。如果不修改就跳过
+yum repository 安装mysql的方式我们是可以选择自己的软件源的。如果不修改就跳过。/etc/yum.repos.d/  
 
 ```
 [mysql-connectors-community]
@@ -123,7 +124,7 @@ yum repolist enabled | grep mysql
 
 安装：`yum install mysql-community-server`
 
-权限设置：`chown mysql:mysql -R /var/lib/mysql`
+权限设置：`chown mysql:mysql -R /var/lib/mysql`       因为数据库文件在这，需要给权限
 
 初始化mysql:`mysqld --initialize`
 
@@ -197,6 +198,19 @@ mysql安装完成后默认是没有密码的，当然，用rpm安装有个初始
 `update user set host = '%' where user = 'admin';`
 
 以上两种方式都是可以的，这里只是说明，避免误解。
+
+创建后在mysql库的user表下查看，有该用户。
+但是使用“mysql -u admin -p” 登录，
+提示无法登录：ERROR 1045 (28000): Access denied for user 'admin'@'localhost' (using password: YES)
+
+>原因：官网解释
+>
+>其中两个账户有相同的用户名monty和密码some_pass。两个账户均为超级用户账户，具有完全的权限可以做任何事情。一个账户 ('monty'@'localhost')只用于从本机连接时。另一个账户('monty'@'%')可用于从其它主机连接。
+>请注意monty的两个账户必须能从任何主机以monty连接。没有localhost账户，当monty从本机连接时，mysql_install_db创建的localhost的匿名用户账户将占先。结果是，monty将被视为匿名用户。原因是匿名用户账户的Host列值比'monty'@'%'账户更具体，这样在user表排序顺序中排在前面。
+
+所以我们在加一个同样的账号，host设为 localhost即可
+
+`grant all on *.* to admin@'localhost' identified by "123456";`
 
 （3）查看下是否添加或者修改成功
 

@@ -364,11 +364,10 @@ Spring Boot对Jackson的支持非常完善，只要我们引入相应类库，Sp
 
 |Jackson枚举|Spring环境变量| 
 |--|--|
-com.fasterxml.jackson.databind.DeserializationFeature|spring.jackson.deserialization.=true|false 
-com.fasterxml.jackson.core.JsonGenerator.Feature|spring.jackson.generator.=true|false 
-com.fasterxml.jackson.databind.MapperFeature|spring.jackson.mapper.=true|false 
-com.fasterxml.jackson.core.JsonParser.Feature|spring.jackson.parser.=true|false 
-com.fasterxml.jackson.databind.SerializationFeature|spring.jackson.serialization.=true|false 
+com.fasterxml.jackson.databind.DeserializationFeature|spring.jackson.deserialization.=true/falsecom.fasterxml.jackson.core.JsonGenerator.Feature|spring.jackson.generator.=true/false 
+com.fasterxml.jackson.databind.MapperFeature|spring.jackson.mapper.=true/false 
+com.fasterxml.jackson.core.JsonParser.Feature|spring.jackson.parser.=true/false 
+com.fasterxml.jackson.databind.SerializationFeature|spring.jackson.serialization.=true/alse 
 com.fasterxml.jackson.annotation.JsonInclude.Include|spring.jackson.default-property-inclusion=always|non_null|non_absent|non_default|non_empty
 
 由于Spring会同时配置相应的`HttpMessageConverters`，所以我们其实要做的很简单，用Jackson注解标注好要映射的Java类，然后直接让控制器返回对象即可！下面是一个Java类。
