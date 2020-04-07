@@ -1,10 +1,6 @@
-
-
 # Go语言map底层浅析
 
-[TOC]
-
-笼统的来说，go的map底层是一个hash表，通过键值对进行映射。 键通过哈希函数生成哈希值，然后go底层的map数据结构就存储相应的hash值，进行索引，最终是在底层使用的数组存储key,和value。稍微详细的说，就设计到go map 的结构。hmap 和bmap。 
+[toc]
 
 # 1、Hash函数
 
@@ -98,15 +94,9 @@ bucket（桶），每一个bucket最多放8个key和value，最后由一个overf
 
   查找或者操作map时，首先key经过hash函数生成hash值，通过哈希值的低8位来判断当前数据属于哪个桶(bucket)，找到bucket以后，通过哈希值的高八位与bucket存储的高位哈希值循环比对，如果相同就比较刚才找到的底层数组的key值，如果key相同，取出value。如果高八位hash值在此bucket没有，或者有，但是key不相同，就去链表中下一个溢出bucket中查找，直到查找到链表的末尾。
   
-<<<<<<< HEAD:goLang/12 go语言 map底层浅析.md
   碰撞冲突：如果不同的key定位到了统一bucket或者生成了同一hash,就产生冲突。 go是通过链表法来解决冲突的。比如一个高八位的hash值和已经存入的hash值相同，并且此bucket存的8个键值对已经满了，或者后面已经挂了好几个bucket了。那么这时候要存这个值就先比对key,key肯定不相同啊，那就从此位置一直沿着链表往后找，找到一个空位置，存入它。所以这种情况，两个相同的hash值高8位是存在不同bucket中的。
   
   查的时候也是比对hash值和key 沿着链表把它查出来。  还有一种情况，就是目前就 1个bucket，并且8个key-value的数组还没有存满，这个时候再比较完key不相同的时候，同样是沿着当前bucket数组中的内存空间往后找，找到第一个空位，插入它。这个就相当于是用寻址法来解决冲突，查找的时候，也是先比较hash值，再比较key,然后沿着当前内存地址往后找。 
-=======
-  碰撞冲突：如果不同的key定位到了同一bucket或者生成了同一hash,就产生冲突。 go是通过链表法来解决冲突的。比如一个高八位的hash值和已经存入的hash值相同，并且此bucket存的8个键值对已经满了，或者后面已经挂了好几个bucket了。那么这时候要存这个值就先比对key,key肯定不相同啊，那就从此位置一直沿着链表往后找，找到一个空位置，存入它。所以这种情况，两个相同的hash值高8位是存在不同bucket中的。
-  
-  查的时候也是比对hash值和key 沿着链表把它查出来。  还有一种情况，就是目前就 1个bucket，并且8个key-value的数组还没有存满，这个时候在比较完key不相同的时候，同样是沿着当前bucket数组中的内存空间往后找，找到第一个空位，插入它。这个就相当于是用寻址法来解决冲突，查找的时候，也是先比较hash值，再比较key,然后沿着当前内存地址往后找。 
->>>>>>> 0d71f194e27e3ce680c7f792cd2f0d5ee18656bc:03语言基础/goLang/12 go语言 map底层浅析.md
   
   go语言的map通过数组+链表的方式实现了hash表，同时分散各个桶，使用链表法+bucket内部的寻址法解决了碰撞冲突，也提高了效率。因为即使链表很长了，go会根据装载因子，去扩容整个bucket数组，所以下面就要看下扩容。
 
@@ -120,9 +110,9 @@ bucket（桶），每一个bucket最多放8个key和value，最后由一个overf
 
 这篇文章，只是对map底层的结构进行了说明，具体创建、查找、删除等的流程是差不多，但是具体的细节还是有很多。所以，我就不一一写出了，贴一下其他博主写的文章，很详细。
 5.1 剖析golang map的实现
-​	地址：https://www.jianshu.com/p/092d4a746620
+	地址：https://www.jianshu.com/p/092d4a746620
 5.2 Golang map 的底层实现
-​	地址：https://www.jianshu.com/p/aa0d4808cbb8
+	地址：https://www.jianshu.com/p/aa0d4808cbb8
 
 **重点来了，必须看**：非常详细的map源码说明
 
@@ -138,5 +128,3 @@ https://www.jianshu.com/p/092d4a746620
 https://www.jianshu.com/p/aa0d4808cbb8
 
 https://blog.csdn.net/i6448038/article/details/82057424
-
-

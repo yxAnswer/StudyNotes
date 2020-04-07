@@ -91,6 +91,14 @@ port：端口			-P
 3. mysql：MySQL系统数据库，保存的登录用户名，密码，以及每个用户的权限等等
 4. test：给用户学习和测试的数据库。
 
+查询在哪个数据库里面：
+
+```sql
+select database()
+```
+
+
+
 ## 2.2  创建数据库
 
 ```mysql
@@ -239,7 +247,7 @@ Database changed
 
 ## 2.7 中文乱码问题（字符集问题）
 
-结论：直接`set names gbk` 就OK了
+临时解决，直接`set names gbk` 就OK了
 
 字符集：字符在保存和传输时对应的二进制编码集合。
 
@@ -267,35 +275,39 @@ Query OK, 0 rows affected (0.00 sec)
 
 但是，服务用utf8解释命令
 
-​	![在这里插入图片描述](https://img-blog.csdnimg.cn/20190708133351903.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTExMzgxOTA=,size_16,color_FFFFFF,t_70)
+查看当前mysql使用的字符集：`show variables like 'character%';`
 
-设置服务器，用gbk字符编码接受客户端发来的命令
+```sql
+mysql> show variables like 'character%';
++--------------------------+------------------------------------------------------------+
+| Variable_name            | Value                                                      |
++--------------------------+------------------------------------------------------------+
+| character_set_client     | gbk                                                        |
+| character_set_connection | gbk                                                        |
+| character_set_database   | utf8                                                       |
+| character_set_filesystem | binary                                                     |
+| character_set_results    | gbk                                                        |
+| character_set_server     | latin1                                                     |
+| character_set_system     | utf8                                                       |
+| character_sets_dir       | D:\work\environment\MySQL\MySQL Server 5.7\share\charsets\ |
++--------------------------+------------------------------------------------------------+
+8 rows in set, 1 warning (0.00 sec)
+```
 
- ![在这里插入图片描述](https://img-blog.csdnimg.cn/20190708133421664.png)
-
-测试：插入中文，成功
-
-​	![在这里插入图片描述](https://img-blog.csdnimg.cn/20190708133440189.png)
-
-查询数据，发现数据乱码
-
- ![在这里插入图片描述](https://img-blog.csdnimg.cn/20190708133506166.png)
-
-原因：以utf返回的结果，客户端用gbk来接受
-
-解决：服务器用gbk返回数据
-
-​	![在这里插入图片描述](https://img-blog.csdnimg.cn/20190708133522918.png)
-
-再次测试，查询数据
-
-​	![在这里插入图片描述](https://img-blog.csdnimg.cn/20190708133538325.png)
+- character_set_client：客户端请求数据的字符集
+- character_set_connection：客户端与服务器连接的字符集
+- character_set_database：数据库服务器中某个库使用的字符集设定，如果建库时没有指明，将默认使用配置
+  上的字符集
+- character_set_results：返回给客户端的字符集(从数据库读取到的数据是什么编码的)
+- character_set_server：为服务器安装时指定的默认字符集设定。
+- character_set_system：系统字符集(修改不了的，就是utf8)
+- character_sets_dir：mysql字符集文件的保存路径
 
 
 
-总结：客户端编码、character_set_client、character_set_results三个编码的值一致即可操作中文。
+**临时解决**：`set names gbk;`
 
-多学一招：我们只要设置“set names 字符编码”，就可以更改character_set_client、character_set_results的值。
+character_set_client、character_set_results、character_set_connection 这三个是作用于外部，只是控制显示数据的编码，实际数据库的编码并未改变。所以，这个是临时的修改方法。
 
 ```sql
 set names gbk 
@@ -303,6 +315,17 @@ set names gbk
 
 
 
- ![在这里插入图片描述](https://img-blog.csdnimg.cn/20190708133557180.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTExMzgxOTA=,size_16,color_FFFFFF,t_70)
+**永久的解决中文乱码问题：修改配置文件my.cnf里边的**
+修改库的字符集编码
+修改表的字符集编码
 
- 
+```sql
+[client]
+default-character-set=gbk
+作用于外部的显示
+[mysqld]
+character_set_server=gbk
+作用于内部，会作用于创建库表时默认字符集
+```
+
+
