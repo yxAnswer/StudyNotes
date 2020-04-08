@@ -38,7 +38,7 @@ type slice struct {
 ## 1、普通初始化（var或者：=  ,字面量）
 
 ```go
-var slice[]int //只声明一个slice,len  和 cap 都是0
+var slice []int //只声明一个slice,len  和 cap 都是0
 var slice0 []int=[]int{1,2,3}//完整声明，字面量初始化
 var slcie1=[]int{1,2,3}  //直接var 字面量初始化
 slice2:=[]int{1,2,3}//函数内部可以用:=替代var 初始化
@@ -153,7 +153,7 @@ newSlice := slice[1:3]
 // 修改 newSlice 索引为 1 的元素
 // 同时也修改了原来的 slice 的索引为 2 的元素
 newSlice[1] = 35      
-//最终底层为   {10,35,30,40,50}
+//最终底层为   {10,20,35,40,50}
 ```
 
 ## 3、append  增长slice
@@ -196,7 +196,7 @@ import "fmt"
 
 func main(){
 	data := [...]int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
-	s := data[:2:3] //长度为1，容量为3
+	s := data[:2:3] //长度为2，容量为3
 	fmt.Printf("len: %d,cap: %d\n",len(s),cap(s))
 	fmt.Printf("原地址对比\n%p\n%p\n",&data[0],&s[0])
 	s2 := append(s, 100) // 添加1一个值，未超过容量
