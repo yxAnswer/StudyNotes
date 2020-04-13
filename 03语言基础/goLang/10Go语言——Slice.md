@@ -290,9 +290,32 @@ cap: 727040 -> 909312  1.25
 cap: 909312 -> 1136640  1.25
 ```
 
-从输出看，容量最开始以2倍的方式进行开辟，数据量越大，增长因子会稳定在1.25左右。
+从输出看，容量最开始以2倍的方式进行开辟，数据量越大，增长因子会稳定在1.25左右。下面看一下源码
 
-**一旦元素个数超过 1000，容量的增长因子会设为 1.25左右，也就是会每次增加 25%的容量。随着语言的演化，这种增长算法可能会有所改变。**
+```go
+if cap > doublecap {
+		newcap = cap
+	} else {
+		if old.len < 1024 {
+			newcap = doublecap
+		} else {
+			// Check 0 < newcap to detect overflow
+			// and prevent an infinite loop.
+			for 0 < newcap && newcap < cap {
+				newcap += newcap / 4
+			}
+			// Set newcap to the requested cap when
+			// the newcap calculation overflowed.
+			if newcap <= 0 {
+				newcap = cap
+			}
+		}
+	}
+```
+
+
+
+**长度小于1024，以2倍的方式增长。超过1024每次增长上次的1/4。也就是会每次增加 25%的容量。随着语言的演化，这种增长算法可能会有所改变。**
 
 在大批量添加数据时，建议一次性分配足够大的空间，以减少内存分配和数据复制开销。或初始化足够长的 len 属性，改用索引号进行操作。及时释放不再使用的 slice 对象，避免持有过期数组，造成 GC 无法回收。 
 
