@@ -94,9 +94,9 @@ $ git checkout .	# 恢复暂存区的所有文件到工作区
 # 版本库————>暂存区
 $ git reset head [file] #重置暂存区，与当前版本库一致
 # 版本库————>重置暂存区 和工作区
-$ git reset --hard	# 重置暂存区与工作区，与上一次commit保持一致
+$ git reset --hard^	# 重置暂存区与工作区，与上一次commit保持一致
 $ git reset --hard [commit]# 回滚到指定commit，重置暂存区和工作区
-
+git
 # 当在本分支没写完不能提交时，要切换分支，可以使用stash  先保存
 $ git stash    #保存工作区，然后去其他分支改bug
 $ git stash list   #查看存储记录
@@ -118,7 +118,7 @@ $ git push origin master   #推送本地master到远程分支master
 $ git push origin dev      #推送本地dev  到远程dev分支（名字自己取）
 
 $ git pull    #下拉远程分支到本地当前分支
-#1.远程有新分支，本地没有时：
+#1.时：
 $ git checkout -b dev  origin/dev  #将远程新分支-创建到本地，比如dev
 
 # 一般git push 前先进行 git pull ，
