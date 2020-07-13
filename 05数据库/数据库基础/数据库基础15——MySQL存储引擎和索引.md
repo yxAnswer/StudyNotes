@@ -96,6 +96,7 @@ create table test (
 	createtime datetime,
 	primary key (id)
 )DEFAULT CHARSET=utf8;
+
 ```
 
 ```shell
