@@ -32,7 +32,7 @@ springboot 有两种配置文件，可以是`properties`,也可以是`yaml`，�
 ## 二、最简单的方式，官网直接复制，需要用啥就复制啥，然后改改
 
 ```
-https://docs.spring.io/spring-boot/docs/2.1.0.BUILD-SNAPSHOT/reference/htmlsingle/#common-application-properties
+https://docs.spring.io/spring-boot/docs/2.1.0.RELEASE/reference/htmlsingle/
 ```
 ### 1、 properties这样写
 `server.port=8080 `

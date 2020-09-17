@@ -169,6 +169,9 @@ vscode安装3个插件：
 Vetur： 代码高亮
 Prettier -Code formatter：格式化代码
 ESlint: 代码检查、规范
+# 还有比较好用的插件
+Vue VSCode Snippets   //可以比较好自动生成代码
+Auto  close Tag  //自动补全标签
 ```
 
 打开vscode 文件——首选项——设置——扩展——eslint——打开settings.json
@@ -192,6 +195,92 @@ ESlint: 代码检查、规范
 可⾃自定义eslint的⼀一些规则
 在 `.eslintrc.js `中覆盖prettier规则即可，覆盖是为了了防⽌止冲突
 在rules⾥里里配置  
+
+## 2.1处理EsLint和 Prettier 格式化和校验冲突
+
+解决方案： 配置prettier 和eslint 一致
+
+根目录创建 `prettier.config.js` 文件
+
+```js
+module.exports = {
+	// tab缩进大小,默认为2
+	tabWidth: 2,
+	// 使用tab缩进，默认false
+	useTabs: true,
+	// 使用分号, 默认true
+	semi: false,
+	// 使用单引号, 默认false(在jsx中配置无效, 默认都是双引号)
+	singleQuote: true,
+	// 行尾逗号,默认none,可选 none|es5|all
+	// es5 包括es5中的数组、对象
+	// all 包括函数对象等所有可选
+	TrailingCooma: 'none',
+	// 对象中的空格 默认true
+	// true: { foo: bar }
+	// false: {foo: bar}
+	bracketSpacing: true,
+
+	// 箭头函数参数括号 默认avoid 可选 avoid| always
+	// avoid 能省略括号的时候就省略 例如x => x
+	// always 总是有括号
+	arrowParens: 'always',
+
+	eslintIntegration: true
+}
+
+```
+
+修改 `.eslintrc.js` 文件
+
+```js
+module.exports = {
+	root: true,
+	env: {
+		node: true
+	},
+	extends: ['plugin:vue/essential', 'eslint:recommended', '@vue/prettier'],
+	parserOptions: {
+		parser: 'babel-eslint'
+	},
+	rules: {
+		'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
+		'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
+		'space-before-function-paren': 0, // 忽略报错
+		'prettier/prettier': [
+			'error',
+			{
+				semi: false,
+				singleQuote: true,
+				// tab缩进大小,默认为2
+				tabWidth: 2,
+				// 使用tab缩进，默认false
+				useTabs: true,
+				// 是否使用分号, 默认true
+				semi: false,
+				// 使用单引号, 默认false(在jsx中配置无效, 默认都是双引号)
+				singleQuote: true,
+				// 行尾逗号,默认none,可选 none|es5|all
+				// es5 包括es5中的数组、对象
+				// all 包括函数对象等所有可选
+				TrailingCooma: 'none',
+				// 对象中的空格 默认true
+				// true: { foo: bar }
+				// false: {foo: bar}
+				bracketSpacing: true,
+
+				// 箭头函数参数括号 默认avoid 可选 avoid| always
+				// avoid 能省略括号的时候就省略 例如x => x
+				// always 总是有括号
+				arrowParens: 'always'
+			}
+		]
+	}
+}
+
+```
+
+这样，你用prettier格式化以后，就不会被eslint校验出错。。 当然 也可以在seetings.json中进行配置.
 
 # 3、配置scss全局变量量  
 
@@ -306,8 +395,35 @@ html, body {
       }
     }
   };
+
+
   
 ```
+
+```js
+//注意哈，这里不同版本有区别
+官方原版：
+css: {
+    loaderOptions: {
+      sass: {
+        //旧版sass-loader写法(8.0以下)
+        data: `@import "@/assets/scss/_variable.scss";`,
+      }
+    }
+}
+修改后：
+css: {
+    loaderOptions: {
+      sass: {
+        //新版scss-loader(8.0及以上)
+        prependData: `@import "@/assets/scss/_variable.scss";";`,
+      }
+    }
+}
+
+```
+
+
 
 - **可以使用我们的全局属性了**。例如
 

@@ -14,7 +14,7 @@ Spring Boot设计了一个非常特别的 PropertySource 顺序，以允许对�
 
 3. 测试用例上的@SpringBootTest#properties注解。
 
-4. **命令行参数**
+4. **命令行参数**  --
 
 5. 来自 SPRING_APPLICATION_JSON 的属性（环境变量或系统属性中内嵌的内联JSON） 。
 
@@ -26,7 +26,7 @@ Spring Boot设计了一个非常特别的 PropertySource 顺序，以允许对�
 
 9. Java系统属性（System.getProperties()） 。
 
-10. **操作系统环境变量。**
+10. **操作系统环境变量。**  -D
 
 11. RandomValuePropertySource，只包含 random.* 中的属性。
 

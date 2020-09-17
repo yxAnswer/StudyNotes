@@ -1,6 +1,6 @@
 [TOC]
 
-### Mybatis增删改查以及事务
+# Mybatis增删改查以及事务
 
 1、实现打印sql语句以及切换数据源
 2、springboot 整合mybatis增删改查实例
@@ -10,6 +10,7 @@
 （1）添加打印sql 配置
 每次通过接口往数据库写入信息，如果我们想查看mybatis实际编译的sql语句，可以使用如下方法：
 在配置文件application.properties 文件中添加如下代码
+
 ```
 #增加打印sql语句，一般用于本地开发测试
 mybatis.configuration.log-impl=org.apache.ibatis.logging.stdout.StdOutImpl
@@ -18,6 +19,7 @@ mybatis.configuration.log-impl=org.apache.ibatis.logging.stdout.StdOutImpl
 （2）切换数据源
 可以再配置文件中设置数据源，默认使用的是HikariDataSource ，我们也可以改为 阿里巴巴的 DruidDataSource数据源
 配置文件如下：
+
 ```
 #数据源
 #如果不使用默认的数据源 （com.zaxxer.hikari.HikariDataSource）
@@ -260,6 +262,7 @@ public class UserController {
 由于上面我们直接controller层调用mapper层，没有经过service层写代码，因为操作简单，所以没必要再写一遍。
 现在我们试一下通过service层 添加事务
 UserServiceImpl类中添加如下代码，，并且再UserService中已经添加了接口
+
 ```java
     @Override
     @Transactional(propagation=Propagation.REQUIRED)
@@ -277,6 +280,7 @@ UserServiceImpl类中添加如下代码，，并且再UserService中已经添加
 ```
 上面代码是开启了事务，然后往数据库添加信息，然后执行异常，这样测试下数据库到底有没有写入信息。
 UserController:
+
 ```java
 
     	//测试事务

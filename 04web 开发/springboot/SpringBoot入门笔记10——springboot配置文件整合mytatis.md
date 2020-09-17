@@ -78,6 +78,8 @@ mybatis.config-location= classpath:mybatis/mybatis-config.xml
 <configuration>
 	<settings>
 		<setting name="mapUnderscoreToCamelCase" value="true"/>
+		<!-- 打印查询语句 -->
+		<setting name="logImpl" value="STDOUT_LOGGING" />
 	</settings>
 </configuration>
 ```
