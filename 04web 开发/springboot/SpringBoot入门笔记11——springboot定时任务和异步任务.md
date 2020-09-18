@@ -256,10 +256,10 @@ public @interface Scheduled {
 
 ```
 Linux
-*    *    *    *    *    *
--    -    -    -    -    -
-|    |    |    |    |    |
-|    |    |    |    |    + year [optional]
+*    *    *    *    *    
+-    -    -    -    -    
+|    |    |    |    |    
+|    |    |    |    |    
 |    |    |    |    +----- day of week (0 - 7) (Sunday=0 or 7)
 |    |    |    +---------- month (1 - 12)
 |    |    +--------------- day of month (1 - 31)
@@ -267,12 +267,11 @@ Linux
 +------------------------- min (0 - 59)
 
 Java(Spring)
-*    *    *    *    *    *    *
--    -    -    -    -    -    -
-|    |    |    |    |    |    |
-|    |    |    |    |    |    + year [optional]
-|    |    |    |    |    +----- day of week (0 - 7) (Sunday=0 or 7)
-|    |    |    |    +---------- month (1 - 12)
+*    *    *    *    *    *
+-    -    -    -    -    -
+|    |    |    |    |    |
+|    |    |    |    |    +----- day of week (0 - 7) (Sunday=0 or 7) OR sun,mon,tue,wed,thu,fri,sat
+|    |    |    |    +---------- month (1 - 12) OR jan,feb,mar,apr ...
 |    |    |    +--------------- day of month (1 - 31)
 |    |    +-------------------- hour (0 - 23)
 |    +------------------------- min (0 - 59)
@@ -331,7 +330,7 @@ Seconds Minutes Hours DayofMonth Month DayofWeek
 
 例子：
 
-比如`@Scheduled(cron = "*/30 * 7-22 * * *")`
+比如`@Scheduled(cron = "*/30 * 7-22 * * * *")`
 
 表示的是每天7点到22点之间，每隔30秒执行一次。
 
@@ -430,13 +429,85 @@ fixedDelayString:  字符串形式，可以通过配置文件指定，比如：
 
 4、在其他地方调用这些方法，所有的方法会异步执行。
 
-注意点：
+例如： 当我们有一些耗时操作，但是还必须返回，就可以通过并行的方式，比如同一个接口有3个操作比较耗时，如果是并行处理，所用时间就是他们3个任务耗时和，如果是并行处理，取决于最耗时那个任务，可以提高效率。
 
-> 	注意点：
-> ​		1）要把异步任务封装到类里面，不能直接写到Controller
-> ​		2）增加Future<String> 返回结果 AsyncResult<String>("task执行完成");  
-> ​		3）如果需要拿到结果 需要判断全部的 task.isDone()
-> ​	
+```java
+@Component
+@Async
+public class AsyncTask {
+
+
+    public void  task1(){
+        try {
+            Thread.sleep(5000L);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        System.out.println("task 1");
+    }
+
+    public Future<String> task2(){
+        try {
+            Thread.sleep(5000L);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        System.out.println("task 2");
+        return new AsyncResult<String>("task 2执行结束");
+    }
+
+    public Future<String> task3(){
+        try {
+            Thread.sleep(5000L);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        System.out.println("task 3");
+        return new AsyncResult<String>("task 3执行结束");
+    }
+}
+
+```
+
+```java
+  	@Autowired
+    AsyncTask asyncTask;
+
+    @GetMapping("testAsync")
+    public ApiResult testAsyncTask(){
+        long start = System.currentTimeMillis();
+        Future<String> stringFuture2 = asyncTask.task2();
+        Future<String> stringFuture3 = asyncTask.task3();
+        String s1="",s2="";
+        for (;;){
+            if (stringFuture2.isDone()&&stringFuture3.isDone()){
+                try {
+                     s1 = stringFuture2.get();
+                     s2 = stringFuture3.get();
+                    System.out.println(stringFuture2.get());
+                    System.out.println(stringFuture3.get());
+
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                }finally {
+                    break;
+                }
+            }
+        }
+        long end = System.currentTimeMillis();
+        System.out.println(end-start);
+        return ApiResult.success(s1+s2);
+    }
+```
+
+
+
+> 注意点：
+> 1）要把异步任务封装到类里面，不能直接写到Controller
+> 2）增加Future<String> 返回结果 AsyncResult<String>("task执行完成");  
+> 3）如果需要拿到结果 需要判断全部的 task.isDone()	
 
 如果要返回结果，比如
 
