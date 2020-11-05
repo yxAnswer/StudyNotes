@@ -99,7 +99,7 @@ range迭代和数组、slice 都一样，只不过这里返回的是map的键值
 
 ## 2.4 map中的delete函数
 
-delete(map,key)  函数可以从map中删除指定key的键值对。**这种方法只能用在映射存储的值都是非零值的情况** 
+delete(map,key)  函数可以从map中删除指定key的键值对。
 
 ```go
 // 删除键为 Coral 的键值对
@@ -163,7 +163,7 @@ m := map[string]int{
 if v, ok := m["a"]; ok { // 判断 key 是否存在。
 	println(v)
 }
-println(m["c"]) // 对于不存在的 key，直接返回 \0，不会出错。
+println(m["c"]) // 对于不存在的 key，直接返回零值，不会出错。
 
 m["b"] = 2 // 新增或修改。
 
