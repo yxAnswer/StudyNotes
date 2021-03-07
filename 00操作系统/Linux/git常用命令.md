@@ -32,6 +32,7 @@ $ git commit [file1] [file2] ... -m [message]  # 提交暂存区的指定文件�
 $ git rm [file1] [file2] ...	# 删除工作区文件，并且将这次删除放入暂存区
 $ git rm -r [文件夹]  #删除文件夹下所有
 $ git rm --cached [file] 	# 停止追踪指定文件，但该文件会保留在工作区
+$ git mv a.txt b.txt	# 重命名文件并直接提交到暂存区
 ```
 
 
@@ -41,10 +42,12 @@ $ git rm --cached [file] 	# 停止追踪指定文件，但该文件会保留在�
 ```shell
 $ git status	# 查看状态
 $ git log		# 显示当前分支的版本历史
-$ git log --pretty --oneline #单行显示所有提交历史
-$ git log --pretty=oneline
+$ git log --all		# 显示所有日志
+$ git log --praph		# 有些图形化的方式现实
+$ git log --oneline #单行显示所有提交历史
+$ git log --pretty=oneline  # --pretty可以做一些格式化，接一些其他属性
 $ git log --pretty=oneline --abbrev-commit 
-$ git log -5 --pretty --oneline 	# 单行显示过去5次所有提交
+$ git log -5  --oneline 	# 单行显示过去5次所有提交
 $ git shortlog -sn	# 显示所有提交过的用户，按提交次数排序
 $ git blame [file]	# 显示指定文件是什么人在什么时间修改过
 $ git diff			# 显示工作区和暂存区的区别
@@ -64,6 +67,8 @@ $ git reflog	# 显示当前分支的最近几次提交
 $ git branch	# 列出所有本地分支
 $ git branch -r # 列出所有远程分支
 $ git branch -a	# 列出所有本地分支和远程分支
+$ git branch -v# 查看分支的最后一次提交
+$ git branch -av #列出所有分支并查看最后一次提交
 
 $ git branch [branch-name]	# 新建一个分支，但依然停留在当前分支
 $ git checkout -b [branch]	# 新建一个分支，并切换到该分支
@@ -177,6 +182,11 @@ Git 取消代理设置：
 ```shell
 $git config --global --unset http.proxy
 $git config --global --unset https.proxy
+```
+
+```shell
+$git cat-file -t   414c3s8 #接一个hash值，查看哈希值的类型
+$git cat-file -p   414sJ53 #查看哈希值内容
 ```
 
 
