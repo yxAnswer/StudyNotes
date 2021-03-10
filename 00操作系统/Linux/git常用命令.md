@@ -170,7 +170,7 @@ $ git log --graph --pretty=oneline
 
 `git merge [branch] -m '日志'`  和 `git merge --no-ff -m '日志'`   方式合并，是非快进方式，就是在合并时会重新在master分支上新增一个commit，然后HEAD 指向它。  还有一个区别是 fast-forward 方式合并，删除分之后，不会看到分支的提交信息。而非快进方式合并可以。
 
-## 7、撤销、回退、修改、变更
+## 7、撤销、回退、修改、变基
 
 **暂存区----->工作区**
 
