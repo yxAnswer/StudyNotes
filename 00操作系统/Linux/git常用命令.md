@@ -1,5 +1,9 @@
 # Git常用命令总结
 
+
+
+## 1、git的基本概念
+
 git有这么几个概念：
 
 - Workspace：工作区
@@ -7,157 +11,246 @@ git有这么几个概念：
 - Repository：仓库区（或本地仓库）
 - Remote：远程仓库
 
-常用命令，先掌握这些再说：
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210310162457724.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTExMzgxOTA=,size_16,color_FFFFFF,t_70)
 
-## 1、初始化、配置
-
+## 2、初始化和配置
+> git在使用前首先要配置user.name 和user.email 两个信息。这么做的目的可能是：
+>
+> - 记录每一个变更是谁在哪个时间点操作的
+> - 在codereview时更方便自动给变更人发email
 ```shell
+# 创建本地仓库
 $ git init				# 在当前目录新建一个Git代码库
 $ git init [project-name]# 新建一个目录，将其初始化为Git代码库
-$ git config --list	# 显示当前的Git配置
-$ git config [--global] user.name "[name]"  # 设置提交代码时的用户信息
-$ git config [--global] user.email "[email address]"
+
+#作用域说明
+$ git config --lobal  #lobal只对某一个仓库有效
+$ git config --global #global对当前用户所有仓库有效
+$ git config --system #system对系统所有登录的用户有效
+
+#操作
+$ git config --list		#显示当前的Git所有配置
+$ git config --list  --global 	#查看global的配置信息，lobal同理
+$ git config [--global] user.name "[name]"     #设置用户名
+$ git config [--global] user.email "[email address]"   #设置email
+$ git config --global user.name #查看global设置的用户名，email同理
 ```
 
 
 
-## 2、添加、提交、删除
+## 3、本地操作（添加、提交、删除）
 
 ```shell
-$ git add [file1] [file2] ...   # 添加指定文件到暂存区
-$ git add [dir]   # 添加指定目录到暂存区，包括子目录
-$ git add .  # 添加当前目录的所有文件到暂存区
-$ git commit -m [message]  # 提交暂存区到仓库区
+#添加到暂存区
+$ git add [file1] [file2] ...   #添加指定文件到暂存区
+$ git add [dir]   #添加指定目录到暂存区，包括子目录
+$ git add .  #添加当前目录的所有文件到暂存区
+$ git add * #等同git add .
+
+# 提交本地仓库
+$ git commit -m [message]  # 提交暂存区所有文件到本地仓库，并记录message信息
 $ git commit [file1] [file2] ... -m [message]  # 提交暂存区的指定文件到仓库区
+
+# 删除文件
 $ git rm [file1] [file2] ...	# 删除工作区文件，并且将这次删除放入暂存区
 $ git rm -r [文件夹]  #删除文件夹下所有
 $ git rm --cached [file] 	# 停止追踪指定文件，但该文件会保留在工作区
+
+# 重命名的快捷方式
 $ git mv a.txt b.tx #将已经添加到暂存区的文件，重命名（相当于先重命名再提交暂存区）
 ```
 
 
 
-## 3、查看信息
+## 4、查看信息
 
 ```shell
-$ git status	# 查看状态
-$ git log		# 显示当前分支的版本历史
+#查看当前仓库git状态
+$ git status 
+
+# 查看提交日志, 多个参数可以组合使用
+$ git log			# 显示当前分支的版本历史
 $ git log --all		# 显示所有日志
-$ git log --praph		# 有些图形化的方式现实
+$ git log --praph	# 有些图形化的方式现实
 $ git log --oneline #单行显示所有提交历史
 $ git log --pretty=oneline  # ---pretty可以做一些格式化，接一些其他属性
-$ git log --pretty=oneline #和直接--oneline对比，就是显示完整的commit id,另者显示简短id
+$ git log --pretty=oneline  #和直接--oneline对比，就是显示完整的commit id,另者显示简短id
 $ git log -5  --oneline 	# 单行显示过去5次所有提交
-$ git shortlog 	# 显示所有提交过的用户及各自提交的log信息
+
+# 统计用户提交日志
+$ git shortlog 		# 显示所有提交过的用户及各自提交的log信息
 $ git shortlog -s	# 显示所有提交过的用户及提交次数
-$ git shortlog -sn	# 显示所有提交过的用户，按提交次数倒序
+$ git shortlog -sn	# 显示所有提交过的用户，按提交次数倒序排
+
+# 追踪责任，查看每一行的版本情况
 $ git blame [file]	# 显示指定文件每一行是谁，在什么时间修改，提交情况（显示文件的每一行的版本情况）
-$ git diff			# 显示工作区和暂存区的区别(如果暂存区为空，已提交，那就是工作区和最新commit的区别，等同git diff HEAD)
-$ git diff HEAD		# 显示工作区与当前分支最新commit之间的差异（工作区和本地仓库区别）
-$ git diff HEAD -- [file]# 显示工作区某一个文件与当前分支最新commit之间的差异（工作区和本地仓库区别，命令有空格）
-$ git diff --cached [file]# 显示暂存区和上一个commit的差异（暂存区和本地仓库区别）
-$ git diff [first-branch]...[second-branch] # 显示两次提交之间的差异
-$ git show [commit版本号]	# 显示某次提交和上一个commit的内容变化。
-$ git reflog	# 显示当前分支的最近几次提交
+
+#显示当前分支的最近几次提交
+$ git reflog	
 ```
 
-
-
-## 4、分支
+## 5、文件对比 git diff
 
 ```shell
-#查看分支
+#工作区 vs 暂存区
+$ git diff	#比较工作区和暂存区的文件内容区别，(如果暂存区为空，已提交，那就是工作区和最新commit的区别，等同git diff HEAD)
+
+#工作区 vs 版本库
+$ git diff HEAD			 #显示工作区与当前分支最新commit之间的差异（工作区和本地仓库区别）
+$ git diff HEAD -- [file]# 显示工作区某一个文件与当前分支最新commit之间的差异（工作区和本地仓库区别，命令有空格）
+
+#暂存区 vs 版本库
+$ git diff --cached [file]	#显示暂存区和上一个commit的差异（暂存区和本地仓库区别）
+
+#多个版本commit比较
+$ git diff [first-branch]...[second-branch] 
+
+#显示某次提交和上一个commit的内容变化。
+$ git show [commit版本号]	
+```
+
+## 6、分支管理
+
+**查看分支**
+
+```shell
 $ git branch	# 列出所有本地分支
 $ git branch -r # 列出所有远程分支
 $ git branch -a	# 列出所有本地分支和远程分支
 $ git branch -v# 查看分支的最后一次提交
 $ git branch -av #列出所有分支并查看最后一次提交
+```
 
-#新建、切换分支
+**新建、切换分支**
+
+```shell
 $ git branch [branch-name]	# 新建一个分支，但依然停留在当前分支
 $ git checkout [branch-name] # 切换到指定分支
-$ git checkout -b [branch]	# 新建一个分支，并切换到该分支
 $ git switch [branch-name] # 切换到指定分支--新版本
+$ git checkout -b [branch]	# 新建一个分支，并切换到该分支
 $ git switch -c [branch]	# 新建一个分支，并切换到该分支--新版本有 
+```
 
-# 删除本地分支
-$ git branch -d [branch-name1] [branch-name2]	# 删除分支（本地的）可多个
-# 删除远程分支--两种
-$ git push origin --delete [branch-name]
-$ git push origin :master
+**删除本地分支**
 
-# 合并分支
+```shell
+$ git branch -d [branch-name1] [branch-name2]	# 删除分支（本地的）可多个; 可以把-d 换为-D
+```
 
-$ git merge [branch] #合并指定分支到当前分支（使用Fast-forward快进方式合并，也就是直接HEAD直接指向制定分支，不会做一次新的提交）
+**删除远程分支**
 
-$ git merge [branch] -m '信息' #合并指定分支到当前分支，会增加一条新的commit,并且分支删除后，可以再分支历史看到记录
-$ git merge --no-ff  -m '日志' [branch]  #使用 --no-ff 方式合并,在删除分支后会保留提交信息，效果和上面相同
-$ git cherry-pick [commit]	#选择一个commit，合并进当前分支
+```shell
+$ git push origin --delete [branch-name]  #两种方式都可以
+$ git push origin :[branch-name]
+```
+
+**合并分支**
+
+```shell
+# 合并指定分支到当前分支（使用Fast-forward快进方式合并，也就是直接HEAD直接指向制定分支，不会做一次新的提交）
+$ git merge [branch] 
+
+# 合并指定分支到当前分支，会增加一条新的commit,并且分支删除后，可以在分支历史看到记录
+$ git merge [branch] -m '信息'
+$ git merge --no-ff  -m '日志' [branch]  //使用 --no-ff 方式合并,在删除分支后会保留提交信息，效果和上面
+
+#选择一个commit，合并进当前分支
+#例如：当在master修复一个bug时，dev分支当然也有这个bug，只需将修复bug那次commit 合并到dev分支，修复bug
+$ git cherry-pick [commit]	
 
 #查看日志分支提交记录，分支合并图
 $ git log --graph --pretty=oneline   
 ```
 
+**Fast-forward 方式和  NO-FF的区别？** 
 
+以 dev分支合并到 master分支为例：
 
-## 5、版本回退（撤销）
+直接使用 `git merge [branch]`，会以fast-forward快进方式合并分支，也就是HEAD指针直接指向dev最新的commit作为master分支最新的commit，只是一个指针的移动，并没有去做提交。
+
+`git merge [branch] -m '日志'`  和 `git merge --no-ff -m '日志'`   方式合并，是非快进方式，就是在合并时会重新在master分支上新增一个commit，然后HEAD 指向它。  还有一个区别是 fast-forward 方式合并，删除分之后，不会看到分支的提交信息。而非快进方式合并可以。
+
+## 7、撤销、回退、修改、变更
+
+**暂存区----->工作区**
+
+- 放弃工作区，使用暂存区覆盖掉工作区的变更，例如：改错了但未添加到暂存区，需要回退一下工作区
 
 ```shell
-# 修改最后一次提交（提交错了，或者提交信息写错了，可以修正）
-$ git commit --amend #如果这时候暂存区没修改，相当于是直接编辑上一次提交说明;
-# ----------------------------------------
+$ git checkout -- [file]	# 恢复暂存区的指定文件到工作区,如果该文件修改后还没有提暂存区，那就会回退到和版本库一致（一定要加-- 有空格，不然的话checkout就是切换分支了）
+$ git checkout .	# 恢复暂存区的所有文件到工作区
+```
+
+**版本库----->暂存区**
+
+- 放弃暂存区。  例如：改错了，但是添加暂存区，未提交版本库，可以放弃暂存区，然后工作区修改完重新add ，或者使用 `git checkout -- [file] ` 直接放弃工作区的修改。
+
+```shell
+$ git reset head [file] #重置暂存区的文件，与当前版本库一致
+```
+
+**版本库----->重置暂存区 、工作区**
+
+- 例如：改错了，已经提交到版本库了，暂未提交远程仓库这时候：就使用 `git reset --hard head^ ` 将版本库回退到上一版本，并且同时会覆盖工作区、暂存区 ，重新写。
+
+```shell
+$ git reset --hard  head^	# 重置暂存区与工作区，与上一次commit保持一致
+$ git reset --hard  head~1	# 重置暂存区与工作区，与上一次commit保持一致，两种写法^^^等同于~3
+$ git reset --hard  [commitid]# 回滚到指定commit，重置暂存区和工作区
+```
+
+**git stash保存工作区**
+
+- 例如：dev分支代码写到一半，这时候要切换到master分支，但是又不想commit，就可以使用`git stash`先保存工作区的修改，然后切换分支。最后回到dev分支，再恢复之前保存的工作区修改。
+
+```shell
+# 当在本分支没写完不能提交时，要切换分支，可以使用stash  先保存
+$ git stash    		#保存工作区，然后去其他分支改bug
+$ git stash list   	#查看存储记录，可以多次git stash就有多条记录
+$ git stash apply  [可以是指定的]   #恢复工作区到上一次保存状态，或者指定某一次
+$ git stash pop  [可以是指定的] #恢复工作区到上一次保存状态，或者指定某一次, 并删除stash记录
+```
+
+**commit的变更**
+
+```shell
+#日志的变更
+	#修改最后一次提交（例如：提交错了，或者提交信息写错了，可以修正）
+$ git commit --amend #如果这时候暂存区没修改，相当于是直接编辑上一次提交说明
 $ git commit -m 'first'
 $ git add  a.txt
 $ git commit --amend -m 'hello'# 这三条命令只会产生一次提交，--amend就是对上次提交的修正 
-# 暂存区————>工作区
-$ git checkout -- [file]	# 恢复暂存区的指定文件到工作区,如果该文件修改后还没有提暂存区，那就会回退到和版本库一致（一定要加-- 有空格，不然的话checkout就是切换分支了）
-$ git checkout .	# 恢复暂存区的所有文件到工作区
-# 版本库————>暂存区
-$ git reset head [file] #重置暂存区的文件，与当前版本库一致
-# 版本库————>重置暂存区 和工作区
-$ git reset --hard  head^	# 重置暂存区与工作区，与上一次commit保持一致
-$ git reset --hard head~1	# 重置暂存区与工作区，与上一次commit保持一致，两种写法^^^等同于~3
-$ git reset --hard [commitid]# 回滚到指定commit，重置暂存区和工作区
 
-# 当在本分支没写完不能提交时，要切换分支，可以使用stash  先保存
-$ git stash    #保存工作区，然后去其他分支改bug
-$ git stash list   #查看存储记录
-$ git stash apply  [可以是指定的]   #恢复工作区
-$ git stash pop  [可以是指定的] #恢复工作区,并删除stash记录
-$ git cherry-pink [commit]	 #版本号-复制其他分支一次提交到本分支。只会复制这一次提交修改的内容
+#修改历史记录的提交信息
+rebase
+
+#合并commit
+
 ```
-
-
-
-## 6、远程仓库、多人协作
-
+## 8、远程仓库、多人协作
 ```shell
+#常用命令
 $ git clone    		 # 克隆项目到本地
 $ git fetch [remote] # 下载远程仓库的所有变动
 $ git remote   		 #查看远程库信息
 $ git remote  -v 	 #查看详细远程仓库信息 
+$ git pull    	#下拉远程分支到本地当前分支
+# 一般git push 前先进行 git pull，先合并，解决冲突
 $ git push origin master   #推送本地master到远程分支master
 $ git push origin dev      #推送本地dev  到远程dev分支（名字自己取）
 
-$ git pull    #下拉远程分支到本地当前分支
-#1.时：
-$ git checkout -b dev  origin/dev  #将远程新分支-创建到本地，比如dev
+#将远程分支dev ,创建到本地并命名为dev关联
+$ git checkout -b dev  origin/dev  
 
-# 一般git push 前先进行 git pull ，
 #如果no tracking information，表示本地和远程没有建立关联
 $ git branch --set-upstream-to  dev  origin/dev     #本地分支dev和远程分支dev建立关联
 $ git branch --set-upstream-to=origin/dev  dev
 
-
-$ git push origin --delete master	#删除远程分支
-$ git push origin :master # 等同于 $ git push origin --delete master
-$ git push origin :master   #理解为 从本地push  空白到远程，即远程为空，删除
+#删除远程分支
+$ git push origin --delete dev	
+$ git push origin :dev # 等同于 $ git push origin --delete master，理解为 从本地push空白到远程，即远程为空，删除
 ```
-
-
-
-## 7、标签TAG
-
+## 9、标签TAG
 ```shell
 $ git tag   			 #查看所有标签
 $ git tag [tag]			 # 新建一个tag在当前commit，例: git tag v1.0
@@ -175,7 +268,27 @@ $ git push origin :refs/tags/[tagName] # 删除远程tag
 $ git checkout -b [branch] [tag]
 ```
 
-## 8、Git 设置代理
+## 10、分离头指针情况
+
+**什么是分离头指针 detached HEAD？** 
+
+当我们执行 `git checkout [commitid]` 将我们某一次的commit 给checkout 出来，就是分离头指针状态。
+
+其实也就是我们工作在在一个没有分支的状态，head指向的是一个commit，而不是一个分支。当然我们可以继续在这个上面继续提交代码，但是一旦我们切换分支后，我们就切不回来了，因为它没有分支。而我们做的提交可能会被git当做垃圾给清除掉。除非我们为它创建一个新分支。
+
+**但是分离头指针什么时候用呢？**
+
+比如：我们要临时做个实验性的修改，这个时候我们就可以使用分离头指针状态，然后切换回原来分支就不用管了，不保存。
+
+当然如果想继续用那个分离头指针的状态，可以为他创建一个分支`git branch <new-branch-name>  <commitid>` 。
+
+还有： 我们在使用`rebase`命令修改 message时，其实就是利用了分离头指针状态。
+
+**head 的指向：**
+
+我们的HEAD可以指向一个分支，也可以指向一个 commit， 而分支的内容和commit的内容其实都是一串hash值，这穿hash值是一个commit类型，也就是 HEAD其实就是指向了一个commit类型，分支其实就是它最新的一次commit。
+
+## 11、git代理设置
 
 代理格式 `[protocol://][user[:password]@]proxyhost[:port]`
 参考 https://git-scm.com/docs/git-config
@@ -201,20 +314,97 @@ $git config --global --unset http.proxy
 $git config --global --unset https.proxy
 ```
 
+## 12. git原理—commit、tree、blob
+
+先学会两个命令，`git cat-file -t`  和 `git cat-file -p` ，一个看类型，一个看内容
+
 ```shell
 $git cat-file -t   414c3s8 #接一个hash值，查看哈希值的类型
 $git cat-file -p   414sJ53 #查看哈希值内容
 ```
 
+当我们研究.git 文件夹时很有用。
+
+.git 文件夹下有这么几个文件夹和文件需要知道：HEAD，config，refs文件夹，objects文件夹
+
+```shell
+.git
+|-HEAD       --------内容：ref: refs/heads/master，就是指向当前是哪个分支
+|-config	 --------配置文件，我们git config --local 所做的操作都写在这个文件
+|-refs	（文件夹）		
+	 |-heads（文件夹）	 -----存放分支的hash,有几个分支，就会有几个文件在该文件夹下，文件的内容是个hash值
+	 |-remotes（文件夹）  -----存放远程分支的hash
+	 |-tags（文件夹）     -----存放标签
+	 |-stash   			-----存放git stash所做的工作区暂存的hash
+
+|-objects（文件夹）  -------存放的是git所有操作所对应的文件快照，以哈希值前两位为文件夹，子集存的是以剩余hash值命名的文件
+	 |-12
+	 |-4a
+```
+
+**git 存储文件的规则**： 只要是文件内容相同，git就认为是同一个文件，不管文件名是什么。
+
+**git 的三种对象**： **commit**  、**tree**  、**blob** 
+
+借用一张图看下（网上找的）：
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210310161440835.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTExMzgxOTA=,size_16,color_FFFFFF,t_70)
+
+试验一下：创建一个git仓库，只创建一个文件夹text,然后在文件夹下创建一个文件test.txt ，文件内容写一句话“这是一个测试文件” ，commit 到本地仓库，然后挨个看一下git的这三个对象
+
+```shell
+#此时的文件夹结构
+|-.git       
+|-text
+	 |test.txt
+```
+
+```shell
+#查看本次提交的commitID
+$ git log --oneline
+1ccbf8c (HEAD -> master) first commit
+
+#查看这个1ccbf8c 是个什么东西？
+$ git cat-file -t 1ccbf8c  #输出了，是个commit类型
+commit
+
+#查看这个东西内容是什么
+$ git cat-file -p 1ccbf8c    #内容是 tree 、author和 committer
+tree ce732ad8e57dd5b0b9018f0f11a5984d36e01fe1
+author answer <962889441@qq.com> 1615362590 +0800
+committer answer <962889441@qq.com> 1615362590 +0800
+
+first commit
+
+#看一下这个tree里面是什么？
+$ git cat-file -p ce732ad8e5   #里面也是一个tree类型，对应text文件夹
+040000 tree dbe740631af037c561a4b479528962efed64941f    text
+
+#继续看这个tree的内容
+$ git cat-file -p  dbe740631a    #里面是个blob,也就是我们的test.txt文件
+100644 blob 1a237b67ce0f08a91a764a66f72e15e691191af8    test.txt
+
+#继续看下blob的内容
+$ git cat-file -p 1a237b67ce0     #这里输出的是我在test.txt里面写的一句话，也就是文件的内容
+这是一个测试文件
 
 
+```
 
+总结一下就是：
 
+- 我们的.git文件夹的HEAD 文件夹存的是指向了master分支
+- 然后 .git/refs/heads/master 文件存的内容就是我们master分支最后一次提交的hash值，也就是 1ccbf8cb34f60186cc39cd5c7481d84fd748e9f9 
+- 然后这次commit 存的是tree(1)、parent、author、committer等
+- tree(1) 存的是tree(2) ，也就是text文件夹
+- tree(2)内容是 blob,也就是我们的test.txt文件
+- 最后这个blob也就是我们文件的真实内容
 
+ 当我们一层层起剥开这个hash值的内容的时候就发现：
+我们的三个对象，commit 包含tree 和blob ，tree也可以包含tree和blob 。   blob 就是最后存储的文件快照。
 
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210310161417536.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTExMzgxOTA=,size_16,color_FFFFFF,t_70) 
 
+git的对象在.git/objects文件夹下存放,都是以hash值前两位为文件夹名称：
 
-
-
-
-
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210310162133143.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTExMzgxOTA=,size_16,color_FFFFFF,t_70)
