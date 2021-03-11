@@ -170,7 +170,7 @@ $ git log --graph --pretty=oneline
 
 `git merge [branch] -m '日志'`  和 `git merge --no-ff -m '日志'`   方式合并，是非快进方式，就是在合并时会重新在master分支上新增一个commit，然后HEAD 指向它。  还有一个区别是 fast-forward 方式合并，删除分之后，不会看到分支的提交信息。而非快进方式合并可以。
 
-## 7、撤销、回退、修改、变基
+## 7、撤销、回退、修改
 
 **暂存区----->工作区**
 
@@ -211,23 +211,9 @@ $ git stash apply  [可以是指定的]   #恢复工作区到上一次保存状�
 $ git stash pop  [可以是指定的] #恢复工作区到上一次保存状态，或者指定某一次, 并删除stash记录
 ```
 
-**commit的变更**
 
-```shell
-#日志的变更
-	#修改最后一次提交（例如：提交错了，或者提交信息写错了，可以修正）
-$ git commit --amend #如果这时候暂存区没修改，相当于是直接编辑上一次提交说明
-$ git commit -m 'first'
-$ git add  a.txt
-$ git commit --amend -m 'hello'# 这三条命令只会产生一次提交，--amend就是对上次提交的修正 
-
-#修改历史记录的提交信息
-rebase
-
-#合并commit
-
-```
 ## 8、远程仓库、多人协作
+
 ```shell
 #常用命令
 $ git clone    		 # 克隆项目到本地
@@ -267,8 +253,122 @@ $ git push origin :refs/tags/[tagName] # 删除远程tag
 # 新建一个分支，指向某个tag
 $ git checkout -b [branch] [tag]
 ```
+## 10、变基 rebase
+### 10.1修改以及合并commit
 
-## 10、分离头指针情况
+**修改最新commit的message**
+
+```shell
+#修改最后一次提交（例如：提交错了，或者提交信息写错了，可以修正）
+$ git commit --amend #如果这时候暂存区没修改，相当于是直接编辑上一次提交说明
+$ git commit -m 'first'
+$ git add  a.txt
+$ git commit --amend -m 'hello'# 这三条命令只会产生一次提交，--amend就是对上次提交的修正 
+```
+
+**修改历史commit的message**
+
+```shell
+#修改历史commit的日志message
+$ git rebase -i [要求改的commit的上一个commitid] #注意是上一个commitid
+#这时候会进入一个编辑页
+pick a8e9b43 my message（日志信息）  # 将pick改为reword ,然后保存，
+#这时候又会进入一个新的编辑页，用来修改这次a8e9b43 的提交日志
+my message   # 将这个日志修改保存即可
+```
+
+**将多个commit合成一个commit**
+
+使用git rebase -i  交互的变基，使用squash方式，使用这个commit，但是要合并到之前的commit
+
+
+```shell
+#比如，git log --oneline 看一下，有6个commit，想把 12345合成一个commit
+$ git log --oneline 
+f6d07f7 (HEAD -> demo) commit5
+ed91cf3 commit4
+06cca74 commit3
+cc417da commit2
+43278d7 commit1
+151a7d0 helloworld
+$ git rebase -i 151a7d0 #一定要选他们的父亲的commitid,会进入编辑页
+pick 43278d7 commit1
+pick cc417da commit2
+pick 06cca74 commit3
+pick ed91cf3 commit4
+pick f6d07f7 commit5
+
+#使用squash方式，squash <commit> = use commit, but meld into previous commit
+#注意：使用squash，顺序很重要，必须是把下面的commit合并到上面的commit，也就是squash上面必须有一个pick的commit
+#例如： 我要把1 2 3 4 合并到 5
+pick 43278d7 commit1
+s cc417da commit2
+s 06cca74 commit3
+s ed91cf3 commit4
+s f6d07f7 commit5
+#例如： 我要把 1 2 合并到5,但是3 4 不变 
+pick 06cca74 commit3
+pick ed91cf3 commit4
+pick f6d07f7 commit5
+s 43278d7 commit1
+s cc417da commit2
+#只要注意顺序即可。保存后会进入另一个编辑页，我们可以写入最终合并的commit的message，然后保存即可
+
+```
+```shell
+rebase的修改模式
+# p, pick <commit> = use commit
+# r, reword <commit> = use commit, but edit the commit message
+# e, edit <commit> = use commit, but stop for amending
+# s, squash <commit> = use commit, but meld into previous commit
+# f, fixup <commit> = like "squash", but discard this commit's log message
+# x, exec <command> = run command (the rest of the line) using shell
+# b, break = stop here (continue rebase later with 'git rebase --continue')
+# d, drop <commit> = remove commit
+# l, label <label> = label current HEAD with a name
+# t, reset <label> = reset HEAD to a label
+# m, merge [-C <commit> | -c <commit>] <label> [# <oneline>]
+# .       create a merge commit using the original merge commit's
+# .       message (or the oneline, if no original merge commit was
+# .       specified). Use -c <commit> to reword the commit message.
+
+```
+
+### 10.2 分支rebase
+
+```shell
+#在有远程分支的情况下，如果分支合并弄得log比较乱，可以直接git rebase 使分支的log成为一条线
+$ git rebase  #或 git rebase origin
+
+#本地分支rebase，比如本地有三个分支--master 生成的server ， server生成的client
+$ git checkout server
+$ git rebase  master   #先切到server分支，然后将server和master共同节点之后的所有更改，在master分支上重新来一次，也就是变基。最后server分支的HEAD指向它（这时候其实server已经和使用merge合并后的代码一样了，但是master分支还是原来的代码）
+$ git checkout master #切换到master
+$ git merge server  #快速合并，其实就是HEAD指向编辑后的最新commit，和server分支的HEAD指向同一个commit
+//这样操作的结果，和git merge 是一样的，区别在于，他们的日志是一条直线
+
+#将一部分的变更，变基到另一个分支的操作，比如：我指向把client分支上的操作合并到master分支，但是由于client是从server上生出来的，并不想把server分支的一些操作合并到master，怎么办？
+$ git  rebase --onto master  server client #--onto就是指定master为基准分支，把client相对于server分支的改变合并到master分支上，但是不包括server分支相对于master的改变。
+# 这时候其实就是client 指向了master变基后的commit，
+$ git checkout master 
+$ git merge client  # 就相当于master和client分支的部分代码（不包含server分支）合并了。
+
+#合并server 到master分支
+$ git rebase master server  #把server分支变基到 master上
+$ git checkout master #切换到master分支
+$ git merge server #快速合并两个分支
+
+//总之最后和git merge的结果基本一样，只是日志的方式不同
+```
+
+分支的rebase详解参考：
+
+[http://iissnan.com/progit/html/zh/ch3_6.html](http://iissnan.com/progit/html/zh/ch3_6.html)
+
+
+
+
+## 11、分离头指针情况
 
 **什么是分离头指针 detached HEAD？** 
 
@@ -288,7 +388,7 @@ $ git checkout -b [branch] [tag]
 
 我们的HEAD可以指向一个分支，也可以指向一个 commit， 而分支的内容和commit的内容其实都是一串hash值，这穿hash值是一个commit类型，也就是 HEAD其实就是指向了一个commit类型，分支其实就是它最新的一次commit。
 
-## 11、git代理设置
+## 12、git代理设置
 
 代理格式 `[protocol://][user[:password]@]proxyhost[:port]`
 参考 https://git-scm.com/docs/git-config
@@ -314,7 +414,7 @@ $git config --global --unset http.proxy
 $git config --global --unset https.proxy
 ```
 
-## 12. git原理—commit、tree、blob
+## 13. git原理—commit、tree、blob
 
 先学会两个命令，`git cat-file -t`  和 `git cat-file -p` ，一个看类型，一个看内容
 
