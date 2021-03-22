@@ -147,10 +147,9 @@ $ git push origin :[branch-name]
 **合并分支**
 
 ```shell
-# 合并指定分支到当前分支（使用Fast-forward快进方式合并，也就是直接HEAD直接指向制定分支，不会做一次新的提交）
+# 合并指定分支到当前分支
 $ git merge [branch] 
-
-# 合并指定分支到当前分支，会增加一条新的commit,并且分支删除后，可以在分支历史看到记录
+# 合并指定分支到当前分支，会增加一条新的commit
 $ git merge [branch] -m '信息'
 $ git merge --no-ff  -m '日志' [branch]  //使用 --no-ff 方式合并,在删除分支后会保留提交信息，效果和上面
 
@@ -166,9 +165,9 @@ $ git log --graph --pretty=oneline
 
 以 dev分支合并到 master分支为例：
 
-直接使用 `git merge [branch]`，会以fast-forward快进方式合并分支，也就是HEAD指针直接指向dev最新的commit作为master分支最新的commit，只是一个指针的移动，并没有去做提交。
+当两个分支合并时，如果节点明确，不如从master建立分支bug,然后修改完合并到master，会以fast-forward快进方式合并分支，也就是HEAD指针直接指向bug最新的commit作为master分支最新的commit，只是一个指针的移动，并没有去做提交。
 
-`git merge [branch] -m '日志'`  和 `git merge --no-ff -m '日志'`   方式合并，是非快进方式，就是在合并时会重新在master分支上新增一个commit，然后HEAD 指向它。  还有一个区别是 fast-forward 方式合并，删除分之后，不会看到分支的提交信息。而非快进方式合并可以。
+ `git merge --no-ff -m '日志'`   方式合并，是非快进方式，就是在合并时会重新在master分支上新增一个commit，然后HEAD 指向它。  还有一个区别是 fast-forward 方式合并，删除分之后，不会看到分支的提交信息。而非快进方式合并可以。
 
 ## 7、撤销、回退、修改
 
@@ -228,6 +227,9 @@ $ git push origin dev      #推送本地dev  到远程dev分支（名字自己�
 #将远程分支dev ,创建到本地并命名为dev关联
 $ git checkout -b dev  origin/dev  
 
+#如果push还没有远程分支
+$ git push --set-upstream-to origin dev #创建远程分支dev并将当前分支push到远程分支
+
 #如果no tracking information，表示本地和远程没有建立关联
 $ git branch --set-upstream-to  dev  origin/dev     #本地分支dev和远程分支dev建立关联
 $ git branch --set-upstream-to=origin/dev  dev
@@ -244,10 +246,10 @@ $ git tag [tag] [commit] # 对指定的提交操作 打标签,例:git tag v0.5 f
 $ git show [tag]   		 #查看tag信息
 $ git tag  -a [tag] -m [message] [commit]  #创建带有说明的标签到指定commit版本
 	#例如： git tag  -a v1.0 -m '周三版本1.0' 3fs3f5
+$ git tag -d [tag]  #删除本地tag 如：git tag -d v1.0
 
 $ git push origin 标签名    #提交指定tag 到远程origin仓库，git push origin v1.0
 $ git push origin --tags    #一次性推送所有本地标签到远程origin仓库
-$ git tag -d [tag]  #删除本地tag 如：git tag -d v1.0
 $ git push origin :refs/tags/[tagName] # 删除远程tag
 
 # 新建一个分支，指向某个tag
