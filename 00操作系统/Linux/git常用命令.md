@@ -71,7 +71,7 @@ $ git status
 # 查看提交日志, 多个参数可以组合使用
 $ git log			# 显示当前分支的版本历史
 $ git log --all		# 显示所有日志
-$ git log --praph	# 有些图形化的方式现实
+$ git log --gpraph	# 有些图形化的方式现实
 $ git log --oneline #单行显示所有提交历史
 $ git log --pretty=oneline  # ---pretty可以做一些格式化，接一些其他属性
 $ git log --pretty=oneline  #和直接--oneline对比，就是显示完整的commit id,另者显示简短id
@@ -234,7 +234,7 @@ $ git branch --set-upstream-to=origin/dev  dev
 
 #删除远程分支
 $ git push origin --delete dev	
-$ git push origin :dev # 等同于 $ git push origin --delete master，理解为 从本地push空白到远程，即远程为空，删除
+$ git push origin :dev # 等同于 $ git push origin --delete dev，理解为 从本地push空白到远程，即远程为空，删除
 ```
 ## 9、标签TAG
 ```shell
@@ -340,7 +340,7 @@ rebase的修改模式
 #在有远程分支的情况下，如果分支合并弄得log比较乱，可以直接git rebase 使分支的log成为一条线
 $ git rebase  #或 git rebase origin
 
-#本地分支rebase，比如本地有三个分支--master 生成的server ， server生成的client
+#本地分支rebase，比如本地有三个分支1、master 2、master生成的server ，3、server生成的client
 $ git checkout server
 $ git rebase  master   #先切到server分支，然后将server和master共同节点之后的所有更改，在master分支上重新来一次，也就是变基。最后server分支的HEAD指向它（这时候其实server已经和使用merge合并后的代码一样了，但是master分支还是原来的代码）
 $ git checkout master #切换到master
