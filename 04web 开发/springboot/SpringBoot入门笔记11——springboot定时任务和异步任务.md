@@ -381,7 +381,7 @@ fixedDelayString:  字符串形式，可以通过配置文件指定，比如：
 
 ```
 
-### 3.4 各域支持的数据类型
+### 3.4 总结各域支持的数据类型
 
     秒：可出现", - * /"四个字符，有效范围为0-59的整数  
     
@@ -507,7 +507,9 @@ public class AsyncTask {
 > 注意点：
 > 1）要把异步任务封装到类里面，不能直接写到Controller
 > 2）增加Future<String> 返回结果 AsyncResult<String>("task执行完成");  
-> 3）如果需要拿到结果 需要判断全部的 task.isDone()	
+> 3）如果需要拿到结果 需要判断全部的 task.isDone()
+> 4)直接调用get()方法其实也可以，他会等着任务完成，多个task的get()会以耗时最长的为准，大家都在等着返回，最后一个反回后，程序继续往下执行。
+> 5）V get(long timeout, TimeUnit unit) 还可以设置等待时长，比如10s不返回认为失败了
 
 如果要返回结果，比如
 
@@ -530,6 +532,7 @@ AsyncResult<>
 Future<String> stringFuture = asyncTask.task3();
 stringFuture.isDone();//表示是否执行完
 stringFuture.cancel();//是否取消
+stringFuture.get();//等待然后取出返回结果。
 ```
 
 
