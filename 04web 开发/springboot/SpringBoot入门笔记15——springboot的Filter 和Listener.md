@@ -160,7 +160,7 @@ public interface Ordered {
 - 使用Servlet3.0的注解进行配置
 - 启动类里面增加 @ServletComponentScan，进行扫描
 - 新建一个Filter类，implements Filter，并实现对应的接口
--  @WebFilter 标记一个类为filter，被spring进行扫描 urlPatterns：拦截规则，支持正则
+-  @WebFilter 标记一个类为filter，被spring进行扫描 urlPatterns：拦截规则，/开头，支持正则
 - 控制chain.doFilter的方法的调用，来实现是否通过放行，不放行，web应用resp.sendRedirect("/index.html");
 - 场景：权限控制、用户登录(**非前端后端分离场景**)等
 
@@ -182,7 +182,7 @@ import javax.servlet.http.HttpServletResponse;
 
 
 /**
- * urlPatterns   拦截请求的url,进行正则匹配，/*是拦截所有的
+ * urlPatterns   拦截请求的url,进行正则匹配，/*是拦截所有的，必须以/开头
  * filterName    过滤器名称
  */
 @WebFilter(urlPatterns = "/api/*", filterName = "loginFilter")
@@ -214,7 +214,14 @@ public class LoginFilter  implements Filter{
             filterChain.doFilter(servletRequest,servletResponse);
         } else {
             resp.sendRedirect("/index.html");
-            return;
+            //或者返回我们约定的json
+//        resp.setCharacterEncoding("utf-8");
+//        try {
+//            PrintWriter writer = resp.getWriter();
+//            writer.print(json);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
         }
 
 
@@ -295,7 +302,7 @@ listener 是监听我们的服务，当满足一定条件，就会触发我们�
 
 **常用的监听器：**
 
- `servletContextListener` :监听程序启动到销毁
+`servletContextListener` :监听程序启动到销毁
 
 `httpSessionListener` ：监听session被创建直到失效的过程
 
@@ -532,17 +539,40 @@ public class LoginIntercepter implements HandlerInterceptor {
 
 - `Filter`是基于函数回调` doFilter()`，而`Interceptor`则是基于AOP思想
 - `Filter`在只在`Servlet`前后起作用，而`Interceptor`够深入到方法前后、异常抛出前后等
-- 依赖于`Servlet`容器即web应用中，而`Interceptor`不依赖于`Servlet容器`所以可以运行在多种环境。
+- `Filter`依赖于`Servlet`容器即web应用中，而`Interceptor`不依赖于`Servlet容器`所以可以运行在多种环境。
 - 在接口调用的生命周期里，`Interceptor`可以被多次调用，而`Filter`只能在容器初始化时调用一次。
+- 顺序：过滤前->拦截前->action执⾏行行->拦截后->过滤后  
+
+## 4.3 Listener（监听）、 Interceptor（拦截器）、Filter（过滤器） 的拦截顺序
+
+以一个Login接口请求到相应结束为例，看一下各个拦截器和监听器的顺序打印情况：
+
+```shell
+================Listener 的requestInitialized()调用了====================
+================Filter 的doFilter调用了====================
+================Interceptor 的preHandle()调用了====================
+================controller 接口调用了====================
+================Interceptor 的postHandle()调用了====================
+================Interceptor 的afterCompletion()调用了====================
+================Listener 的requestDestroyed()调用了====================
+```
 
 
 
-**Filter和Interceptor的执行顺序:**
-     	
+可以看到，
 
-过滤前 -> 拦截前 -> action执行 -> 拦截后 -> 过滤后
+- **程序启动**，filter的init()先调用
+- **开始请求**，首先Listener  的requestInitialized()先调用初始化
+- 然后走 Fileter 的doFilter()方法，执行过滤逻辑
+- **接口方法执行前**：Interceptor拦截器的preHandle()调用
+- **接口执行**：controller层的接口执行具体的代码
+- 接口执行后：Interceptor拦截器的的postHandle()调用
+- 然后是：Interceptor拦截器的的的afterCompletion()调用
+- **请求结束**：Listener的的requestDestroyed
 
-总的来说，过滤器 比拦截器触发早，销毁晚，依赖Servlet容器。 拦截器更加灵活
+总的来说，Listener监听的是 servlet 初始化和销毁；然后Filter 依赖于servlet容器，初始化了以后执行，然后销毁之前进行执行，Interceptor拦截器 是作用于 接口方法执行前、执行后，不依赖于servlet。
+
+Listener-——>Filter——>Interceptor——>接口方法——>Interceptor——>Filter——>Listener
 
 
 
