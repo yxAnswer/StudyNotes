@@ -1,11 +1,5 @@
----
-title: Jackson快速入门——转载
-date: 2018-10-6 
-tags:
-- java
-categories:
-- java
----
+# Jackson快速入门——转载
+
 
 Java生态圈中有很多处理JSON和XML格式化的类库，Jackson是其中比较著名的一个。虽然JDK自带了XML处理类库，但是相对来说比较低级，使用本文介绍的Jackson等高级类库处理起来会方便很多。
 
@@ -30,7 +24,7 @@ dependencies {
     compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jdk8', version: jacksonVersion
 
     compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.16.22'
-}12345678910111213141516171819
+}
 ```
 Maven配置请去mvnrepository搜索。
 
@@ -68,7 +62,7 @@ Jackson类库包含了很多注解，可以让我们快速建立Java类与JSON�
 public class Friend {
     private String nickname;
     private int age;
-}1234567
+}
 ```
 然后就可以处理JSON数据了。首先需要一个ObjectMapper对象，序列化和反序列化都需要它。
 ```
@@ -88,12 +82,12 @@ public class Friend {
         newFriend = mapper.readValue(bytes, Friend.class);
         // 从文件中读取
         newFriend = mapper.readValue(new File("friend.json"), Friend.class);
-        System.out.println(newFriend);1234567891011121314151617
+        System.out.println(newFriend);
 ```
 程序结果如下。可以看到生成的JSON属性和Java类中定义的一致。
 ```
 {"nickname":"yitian","age":25}
-Friend(nickname=yitian, age=25)12
+Friend(nickname=yitian, age=25)
 
 ```
 
@@ -102,7 +96,7 @@ Friend(nickname=yitian, age=25)12
 除了使用Java类进行映射之外，我们还可以直接使用Map和List等Java集合组织JSON数据，在需要的时候可以使用readTree方法直接读取JSON中的某个属性值。需要注意的是从JSON转换为Map对象的时候，由于Java的类型擦除，所以类型需要我们手动用new TypeReference<T>给出。
 
 
-```
+```java
         ObjectMapper mapper = new ObjectMapper();
 
         Map<String, Object> map = new HashMap<>();
@@ -121,19 +115,19 @@ Friend(nickname=yitian, age=25)12
         String name = root.get("name").asText();
         int age = root.get("age").asInt();
 
-        System.out.println("name:" + name + " age:" + age);12345678910111213141516171819
+        System.out.println("name:" + name + " age:" + age);
 ```
 程序结果如下。
 ```
 {"name":"yitian","interests":["pc games","music"],"age":25}
 {name=yitian, interests=[pc games, music], age=25}
-name:yitian age:25123
+name:yitian age:25
 ```
 
 ### Jackson配置
 
 Jackson预定义了一些配置，我们通过启用和禁用某些属性可以修改Jackson运行的某些行为。详细文档参考[JacksonFeatures。](https://github.com/FasterXML/jackson-databind/wiki/JacksonFeatures)下面我简单翻译一下Jackson README上列出的一些属性。
-```
+```java
 // 美化输出
 mapper.enable(SerializationFeature.INDENT_OUTPUT);
 // 允许序列化空的POJO类
@@ -156,7 +150,7 @@ mapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
 // 强制转义非ASCII字符
 mapper.configure(JsonGenerator.Feature.ESCAPE_NON_ASCII, true);
 // 将内容包裹为一个JSON属性，属性名由@JsonRootName注解指定
-mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, true);1234567891011121314151617181920212223
+mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, true);
 ```
 这里有三个方法，configure方法接受配置名和要设置的值，Jackson 2.5版本新加的enable和disable方法则直接启用和禁用相应属性，我推荐使用后面两个方法。
 
@@ -164,7 +158,7 @@ mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, true);1234567891011121314
 ### 用注解管理映射
 
 前面介绍了一些Jackson注解，下面来应用一下这些注解。首先来看看使用了注解的Java类。
-```
+```java
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -179,12 +173,12 @@ public class FriendDetail {
     @JsonIgnore
     private int uselessProp2;
     private String uselessProp3;
-}123456789101112131415
+}
 ```
 然后看看代码。需要注意的是，由于设置了排除的属性，所以生成的JSON和Java类并不是完全对应关系，所以禁用`DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES`是必要的。
 
 
-```
+```java
         ObjectMapper mapper = new ObjectMapper();
         //mapper.enable(SerializationFeature.WRAP_ROOT_VALUE);
         mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
@@ -200,12 +194,12 @@ public class FriendDetail {
 
 ```
 {"NickName":"yitian","Age":25}
-FriendDetail(name=yitian, age=25, uselessProp1=null, uselessProp2=0, uselessProp3=null)12
+FriendDetail(name=yitian, age=25, uselessProp1=null, uselessProp2=0, uselessProp3=null)
 ```
 然后取消注释代码中的那行，也就是启用`WRAP_ROOT_VALUE`功能，再运行一下程序，运行结果如下。可以看到生成的JSON结果发生了变化，而且由于JSON结果变化，所以Java类转换失败（所有字段值全为空）。`WRAP_ROOT_VALUE`这个功能在有些时候比较有用，因为有些JSON文件需要这种结构。
 ```
 {"FriendDetail":{"NickName":"yitian","Age":25}}
-FriendDetail(name=null, age=0, uselessProp1=null, uselessProp2=0, uselessProp3=null)12
+FriendDetail(name=null, age=0, uselessProp1=null, uselessProp2=0, uselessProp3=null)
 ```
 ### Java8日期时间类支持
 
@@ -214,7 +208,7 @@ Java8增加了一套全新的日期时间类，Jackson对此也有支持。这�
         ObjectMapper mapper = new ObjectMapper()
                 .registerModule(new JavaTimeModule())
                 .registerModule(new ParameterNamesModule())
-                .registerModule(new Jdk8Module());1234
+                .registerModule(new Jdk8Module());
 ```
 导入类库之后，Jackson也可以自动搜索所有模块，不需要我们手动注册。
  `mapper.findAndRegisterModules();1`
@@ -238,7 +232,7 @@ public class Person {
     @JsonFormat(pattern = "yyyy-MM-DD")
     private LocalDate birthday;
 
-}123456789101112131415161718
+}
 ```
 然后来看看代码。
 ```
@@ -252,17 +246,17 @@ public class Person {
 
         Person p2 = mapper.readValue(text, Person.class);
         System.out.println(p2);
-    }1234567891011
+    }
 ```
 运行结果如下。可以看到，生成的JSON日期变成了[1994,1,1]这样的时间戳形式，一般情况下不符合我们的要求。
 ```
 {"birthday":[1994,1,1],"Name":"yitian","NickName":"易天","Age":25,"IdentityCode":"10000"}
-Person(name=yitian, nickname=易天, age=25, identityCode=10000, birthday=1994-01-01)12
+Person(name=yitian, nickname=易天, age=25, identityCode=10000, birthday=1994-01-01)
 ```
 取消注释那行代码，程序运行结果如下。这样一来就变成了我们一般使用的形式了。如果有格式需要的话，可以使用`@JsonFormat(pattern = "yyyy-MM-DD")`注解格式化日期显示。
 ```
 {"birthday":"1994-01-01","Name":"yitian","NickName":"易天","Age":25,"IdentityCode":"10000"}
-Person(name=yitian, nickname=易天, age=25, identityCode=10000, birthday=1994-01-01)12
+Person(name=yitian, nickname=易天, age=25, identityCode=10000, birthday=1994-01-01)
 ```
 
 处理XML
@@ -288,7 +282,7 @@ Jackson XML除了使用Jackson JSON和JDK JAXB的一些注解之外，自己也�
 ### XML映射
 
 新建如下一个Java类。
-```
+```java
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -309,10 +303,10 @@ public class Person {
     @JsonFormat(pattern = "yyyy/MM/DD")
     private LocalDate birthday;
 
-}123456789101112131415161718192021
+}
 ```
 下面是代码示例，基本上和JSON的API非常相似，XmlMapper实际上就是ObjectMapper的子类。
-```
+```java
         Person p1 = new Person("yitian", "易天", 25, "10000", LocalDate.of(1994, 1, 1));
         XmlMapper mapper = new XmlMapper();
         mapper.findAndRegisterModules();
@@ -322,12 +316,12 @@ public class Person {
         System.out.println(text);
 
         Person p2 = mapper.readValue(text, Person.class);
-        System.out.println(p2);12345678910
+        System.out.println(p2);
 ```
 运行结果如下。
 
 
-```
+```xml
 <Person>
   <Name>yitian</Name>
   <NickName>易天</NickName>
@@ -336,17 +330,17 @@ public class Person {
   <Birthday>1994/01/01</Birthday>
 </Person>
 
-Person(name=yitian, nickname=易天, age=25, identityCode=10000, birthday=1994-01-01)123456789
+Person(name=yitian, nickname=易天, age=25, identityCode=10000, birthday=1994-01-01)
 ```
 如果取消那两行注释，那么运行结果如下。可以看到Jackson XML注解对生成的XML的控制效果。
-```
+```xml
 <Person birthday="1994/01/01">
   <Name>yitian</Name>易天
   <Age>25</Age>
   <IdentityCode><![CDATA[10000]]></IdentityCode>
 </Person>
 
-Person(name=yitian, nickname=null, age=25, identityCode=10000, birthday=1994-01-01)1234567
+Person(name=yitian, nickname=null, age=25, identityCode=10000, birthday=1994-01-01)
 
 ```
 
@@ -362,16 +356,16 @@ Spring Boot对Jackson的支持非常完善，只要我们引入相应类库，Sp
 
 如果需要修改自动配置的ObjectMapper属性也非常简单，Spring Boot提供了一组环境变量，直接在application.properties文件中修改即可。
 
-|Jackson枚举|Spring环境变量| 
-|--|--|
-com.fasterxml.jackson.databind.DeserializationFeature|spring.jackson.deserialization.=true/falsecom.fasterxml.jackson.core.JsonGenerator.Feature|spring.jackson.generator.=true/false 
-com.fasterxml.jackson.databind.MapperFeature|spring.jackson.mapper.=true/false 
-com.fasterxml.jackson.core.JsonParser.Feature|spring.jackson.parser.=true/false 
-com.fasterxml.jackson.databind.SerializationFeature|spring.jackson.serialization.=true/alse 
-com.fasterxml.jackson.annotation.JsonInclude.Include|spring.jackson.default-property-inclusion=always|non_null|non_absent|non_default|non_empty
+| Jackson枚举 | Spring环境变量 |
+| ----------- | -------------- |
+|com.fasterxml.jackson.databind.DeserializationFeature|spring.jackson.deserialization.=true/falsecom.fasterxml.jackson.core.JsonGenerator.Feature|spring.jackson.generator.=true/false|
+|com.fasterxml.jackson.databind.MapperFeature|spring.jackson.mapper.=true/false |
+|com.fasterxml.jackson.core.JsonParser.Feature|spring.jackson.parser.=true/false |
+|com.fasterxml.jackson.databind.SerializationFeature|spring.jackson.serialization.=true/alse |
+|com.fasterxml.jackson.annotation.JsonInclude.Include|spring.jackson.default-property-inclusion=always|non_null|non_absent|non_default|non_empty|
 
 由于Spring会同时配置相应的`HttpMessageConverters`，所以我们其实要做的很简单，用Jackson注解标注好要映射的Java类，然后直接让控制器返回对象即可！下面是一个Java类。
-```
+```java
 @JsonRootName("person")
 public class Person {
     @JsonProperty
@@ -386,11 +380,11 @@ public class Person {
         this.id = id;
         this.birthday = birthday;
     }
-}123456789101112131415
+}
 ```
 然后是控制器代码。在整个过程中我们只需要引入Jackson类库，然后编写业务代码就好了。关于如何配置Jackson类库，我们完全不需要管，这就是Spring Boot的方便之处。
 
-```
+```java
 @Controller
 public class MainController {
     private Person person = new Person("yitian", 10000, LocalDate.of(1994, 1, 1));
@@ -406,7 +400,7 @@ public class MainController {
     public Person json() {
         return person;
     }
-}12345678910111213141516
+}
 ```
 进入localhost:8080/xml就可以看到对应结果了。 
 
@@ -414,7 +408,7 @@ public class MainController {
 
 Spring Boot自动配置非常方便，但不是万能的。在必要的时候，我们需要手动配置Bean来替代自动配置的Bean。
 
-```
+```java
 @Configuration
 public class JacksonConfig {
     @Bean
@@ -437,11 +431,11 @@ public class JacksonConfig {
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         return mapper;
     }
-}1234567891011121314151617181920212223
+}
 ```
 然后在需要的地方进行依赖注入。需要注意为了区分ObjectMapper和XmlMapper，需要使用@Qualifier注解进行标记。
 
-```
+```java
 @Controller
 public class MainController {
     private ObjectMapper jsonMapper;
@@ -451,7 +445,7 @@ public class MainController {
     public MainController(@Autowired @Qualifier("json") ObjectMapper jsonMapper, @Autowired @Qualifier("xml") XmlMapper xmlMapper) {
         this.jsonMapper = jsonMapper;
         this.xmlMapper = xmlMapper;
-    }12345678910
+    }
 ```
 以上就是Jackson类库的一些介绍，希望对大家有所帮助。
 

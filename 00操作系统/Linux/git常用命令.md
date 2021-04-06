@@ -71,7 +71,7 @@ $ git status
 # 查看提交日志, 多个参数可以组合使用
 $ git log			# 显示当前分支的版本历史
 $ git log --all		# 显示所有日志
-$ git log --gpraph	# 有些图形化的方式现实
+$ git log --graph	# 有些图形化的方式现实
 $ git log --oneline #单行显示所有提交历史
 $ git log --pretty=oneline  # ---pretty可以做一些格式化，接一些其他属性
 $ git log --pretty=oneline  #和直接--oneline对比，就是显示完整的commit id,另者显示简短id
@@ -165,7 +165,7 @@ $ git log --graph --pretty=oneline
 
 以 dev分支合并到 master分支为例：
 
-当两个分支合并时，如果节点明确，不如从master建立分支bug,然后修改完合并到master，会以fast-forward快进方式合并分支，也就是HEAD指针直接指向bug最新的commit作为master分支最新的commit，只是一个指针的移动，并没有去做提交。
+当两个分支合并时，如果节点明确，比如从master建立分支bug,然后修改完合并到master，会以fast-forward快进方式合并分支，也就是HEAD指针直接指向bug最新的commit作为master分支最新的commit，只是一个指针的移动，并没有去做提交。
 
  `git merge --no-ff -m '日志'`   方式合并，是非快进方式，就是在合并时会重新在master分支上新增一个commit，然后HEAD 指向它。  还有一个区别是 fast-forward 方式合并，删除分之后，不会看到分支的提交信息。而非快进方式合并可以。
 
