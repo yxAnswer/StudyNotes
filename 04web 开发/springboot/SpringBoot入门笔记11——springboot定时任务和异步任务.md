@@ -5,15 +5,15 @@
 ##  1、java 中常用的定时任务
 
 > 1、常见定时任务 Java自带的java.util.Timer类
-> ​			timer:配置比较麻烦，时间延后问题
-> ​			timertask:不推荐
+> 			timer:配置比较麻烦，时间延后问题
+> 			timertask:不推荐
 > 2、Quartz框架
-> ​		配置更简单
-> ​		xml或者注解
+> 		配置更简单，适合分布式或者⼤大型调度作业  
+> 		xml或者注解
 > 3、SpringBoot使用注解方式开启定时任务
-> ​		1）启动类里面 @EnableScheduling开启定时任务，自动扫描
-> ​		2）定时任务业务类 加注解 @Component被容器扫描
-> ​		3）定时执行的方法加上注解 @Scheduled(fixedRate=2000) 定期执行一次
+> 		1）启动类里面 @EnableScheduling开启定时任务，自动扫描
+> 		2）定时任务业务类 加注解 @Component被容器扫描
+> 		3）定时执行的方法加上注解 @Scheduled(fixedRate=2000) 定期执行一次
 
 
 

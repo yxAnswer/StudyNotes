@@ -13,7 +13,7 @@
 
 我们可以打开我们的springboot源码看下，在`org.springframework.boot:spring-boot:2.0.4.RELEASE`下的
 
-springframework->boot->web->servlet->filter 可以看懂有五个类
+springframework->boot->web->servlet->filter 可以看到有五个类
 
 ```
 ApplicationContextHeaderFilter
