@@ -134,7 +134,7 @@ yum repolist enabled | grep mysql
 
 `systemctl status mysqld`  看到active (running) 表示正常。
 
-```
+```shell
 [root@iZszxghs0ozok0Z yum.repos.d]# systemctl status mysqld
 ● mysqld.service - MySQL Community Server
    Loaded: loaded (/usr/lib/systemd/system/mysqld.service; enabled; vendor preset: disabled)
@@ -153,7 +153,7 @@ yum repolist enabled | grep mysql
 
 mysqladmin --version
 
-```
+```shell
 [root@iZszxghs0ozok0Z yum.repos.d]# mysqladmin --version
 mysqladmin  Ver 8.42 Distrib 5.6.43, for Linux on x86_64
 

@@ -96,7 +96,7 @@ The classpath root
 我们在使用Spring Boot的时候，通常也需要定义一些自己使用的属性，我们可以如下方式直接定义：
 
 ```properties
-com.text.name.name=姓名
+com.text.name=姓名
 com.text.title=Spring Boot标题
 ```
 
