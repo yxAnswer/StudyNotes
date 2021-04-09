@@ -228,7 +228,7 @@ $ git push origin dev      #推送本地dev  到远程dev分支（名字自己�
 $ git checkout -b dev  origin/dev  
 
 #如果push还没有远程分支
-$ git push --set-upstream-to origin dev #创建远程分支dev并将当前分支push到远程分支
+$ git push --set-upstream origin dev #创建远程分支dev并将当前分支push到远程分支
 
 #如果no tracking information，表示本地和远程没有建立关联
 $ git branch --set-upstream-to  dev  origin/dev     #本地分支dev和远程分支dev建立关联
