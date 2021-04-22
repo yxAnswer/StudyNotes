@@ -572,7 +572,7 @@ public class LoginIntercepter implements HandlerInterceptor {
 
 总的来说，Listener监听的是 servlet 初始化和销毁；然后Filter 依赖于servlet容器，初始化了以后执行，然后销毁之前进行执行，Interceptor拦截器 是作用于 接口方法执行前、执行后，不依赖于servlet。
 
-Listener-——>Filter——>Interceptor——>接口方法——>Interceptor——>Filter——>Listener
+Listener-——>Filter——>Interceptor——>接口方法——>Interceptor——>Listener
 
 
 

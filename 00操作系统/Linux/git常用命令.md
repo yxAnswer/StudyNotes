@@ -339,7 +339,7 @@ rebase的修改模式
 ### 10.2 分支rebase
 
 ```shell
-#在有远程分支的情况下，如果分支合并弄得log比较乱，可以直接git rebase 使分支的log成为一条线
+#在有远程分支的情况下，如果分支合并弄得log比较乱，可以直接git rebase 使分支的log成为一条线，然后再提交
 $ git rebase  #或 git rebase origin
 
 #本地分支rebase，比如本地有三个分支1、master 2、master生成的server ，3、server生成的client
