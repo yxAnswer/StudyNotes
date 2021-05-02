@@ -41,7 +41,7 @@
 ```
 #set java environment
 JAVA_HOME=/usr/local/java/jdk1.8.0_201
-CLASSPATH=.:$JAVA_HOME/lib.tools.jar
+CLASSPATH=.:$JAVA_HOME/lib
 PATH=$JAVA_HOME/bin:$PATH
 export JAVA_HOME CLASSPATH PATH
 ```
@@ -65,12 +65,12 @@ export JAVA_HOME CLASSPATH PATH
 ```
 #set java environment
 JAVA_HOME=/usr/local/java/jdk1.8.0_201
-CLASSPATH=.:$JAVA_HOME/lib.tools.jar
+CLASSPATH=.:$JAVA_HOME/lib
 PATH=$JAVA_HOME/bin:$PATH
 export JAVA_HOME CLASSPATH PATH
 ```
 
-如果出现无法执行二进制的错误，注意需要jdk版本和linux 版本一直，32都是32,64 都是64
+如果出现无法执行二进制的错误，注意需要jdk版本和linux 版本一致，32都是32,64 都是64
 
 ## 2、rpm方式安装mysql
 
