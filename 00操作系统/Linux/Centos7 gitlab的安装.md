@@ -143,3 +143,42 @@ firewall-cmd --query-port=8888/tcp
 - 重新设置root 密码
 - 登录，尽情使用把
 
+## 8、gitlab配置邮件服务
+
+邮件服务的作用：有合并请求时，邮件通知 账号注册时，邮件验证 修改密码时，通过邮件修改  。
+
+- 尽量不要用163邮箱，因为发送几次就不能发送了。可以用qq邮箱。
+
+- 打开QQ邮箱——>设置——>账户——>smtp——>密保验证——>验证成功返回一串字符串，保存下来。
+
+- 修改gitlab配置文件
+
+  ```
+  vim /etc/gitlab/gitlab.rb # 修改
+  按/后输入smtp_enable，找到下面这一串文本，进行修改
+  gitlab_rails['smtp_enable'] = true
+  gitlab_rails['smtp_address'] = "smtp.qq.com"
+  gitlab_rails['smtp_port'] = 465
+  gitlab_rails['smtp_user_name'] = "xxxxxxxx@qq.com"
+  gitlab_rails['smtp_password'] = "开通smtp时返回的字符"
+  gitlab_rails['smtp_domain'] = "qq.com"
+  gitlab_rails['smtp_authentication'] = "login"
+  gitlab_rails['smtp_enable_starttls_auto'] = true
+  gitlab_rails['smtp_tls'] = true
+  user['git_user_email'] = "xxxxxx@qq.com"
+  gitlab_rails['gitlab_email_from'] = 'xxxxxxx@qq.com
+  
+  # 在这里配置好自己的邮箱即可，然后保存，重新配置
+  gitlab-ctl reconfigure
+  
+  ```
+
+- 测试邮件服务是否正常
+
+```shell
+gitlab-rails console #进入控制台 
+#然后，输入
+Notify.test_email('接收方邮件地址','邮件标题','邮件内容').deliver_now
+# 按回车，测试发送。
+```
+

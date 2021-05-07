@@ -19,6 +19,12 @@ rpm -ivh mysql-community-release-el7-5.noarch.rpm
 
 ## 2、修改yum源，设置版本(可选)
 
+当我们安装mysql的yum源后，会在/etc/yum.repos.d/  多出两个文件：`mysql-community.repo `和`mysql-community-source.repo `
+
+> 在MySQL Yum存储库、MySQL社区服务器的不同版本系列托管在不同的子存储库中。最新的GA系列(当前的MySQL 8.0)的子存储库在默认情况下是启用的，所有其他系列(例如，MySQL 5.7系列)的子存储库在默认情况下是禁用的。
+>
+> 使用此命令查看MySQL Yum存储库中的所有子存储库，并查看哪些子存储库已启用或禁用，
+
 yum repository 安装mysql的方式我们是可以选择自己的软件源的。如果不修改就跳过。/etc/yum.repos.d/  
 
 ```
@@ -67,7 +73,7 @@ gpgkey=file:/etc/pki/rpm-gpg/RPM-GPG-KEY-mysql
 
 **查看不同版本默认启用情况：**
 
-可以看到 enabled 的情况
+可以看到 enabled 的情况，当前命令其实就是查看/etc/yum.repos.d目录中的  mysql-community.repo和mysql-community-source.repo文件内容
 
 ```
 [root@iZszxghs0ozok0Z yum.repos.d]# yum repolist all |grep mysql
@@ -108,6 +114,8 @@ yum repolist enabled | grep mysql
 
 ### 3.1检查是否安装
 
+**卸载之前安装的mysql:**
+
 `yum list installed | grep mysql`或者
 
 `rpm -qa | grep -i mysql`
@@ -116,19 +124,31 @@ yum repolist enabled | grep mysql
 
 `rpm -e --nodeps  软件名` 或者`yum -y remove 软件名`
 
+**卸载centos7自带的 mariadb 数据库:**
+
+```shell
+rpm -qa | grep mariadb
+#如果找到，就卸载
+rpm -e --nodeps mariadb-libs-5.5.68-1.el7.x86_64
+```
+
+
+
 ### 3.2 安装
 
 安装之前如果没有更新yum 的最好更新下
 
-更新：`yum update`
+更新：`yum upgrade`
 
 安装：`yum install mysql-community-server`
 
-权限设置：`chown mysql:mysql -R /var/lib/mysql`       因为数据库文件在这，需要给权限
+权限设置：`chown mysql:mysql -R /var/lib/mysql`       因为数据库文件在这，需要给权限,这里创建了mysql这个用户以及mysql组，
+
+然后设置可写权限：`chmod -R 777 /var/lib/mysql`  不然innodb报错
 
 初始化mysql:`mysqld --initialize`
 
-启动mysql: `systemctl start mysqld`
+启动mysql: `systemctl start mysqld.service`
 
 查看mysql 运行状态：
 
@@ -165,15 +185,34 @@ mysqladmin  Ver 8.42 Distrib 5.6.43, for Linux on x86_64
 
 ### 4.1 设置用户密码
 
-直接在命令行输入mysql回车，发现已经进入了mysql服务，没有密码。
+mysql5.7安装后会生成一个默认密码，如果直接登录可能报错。
 
-mysql安装完成后默认是没有密码的，当然，用rpm安装有个初始密码，这个本章不考虑。这里我们需要创建用户的密码。
+可能出现： 
 
-`mysqladmin -u root password "123456"`
+ERROR 1045 (28000): Access denied for user 'root'@'localhost' (using password: NO)，因为mysql5.7给root用户默认创建了一个密码，存在log日志里面，执行下面命令找出。
 
-这里我将用户root ，设置密码为123456。
+```shell
+grep "temporary password" /var/log/mysqld.log 
 
-`mysql -u root -p 123456` 登录mysql，进行操作。
+2021-05-07T15:27:11.781922Z 1 [Note] A temporary password is generated for root@localhost: ;(fA9tbfoL*;
+
+#这里的;(fA9tbfoL*; 就是默认密码
+```
+
+`mysql -u root -p ;(fA9tbfoL*;  `登录mysql，进行操作。
+
+执行操作会出现如下错误：
+
+`ERROR 1820 (HY000): You must reset your password using ALTER USER statement before executing this statement.`
+
+需要我们重置root密码：
+
+```shell
+alter user 'root'@'localhost' identified by 'Root_11'; #密码有规则，太简单会报错
+或set password for 'root'@'localhost'=password('Root_11');
+```
+
+
 
 ### 4.2 添加账号，设置权限
 

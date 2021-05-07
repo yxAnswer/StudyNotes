@@ -14,6 +14,20 @@
 
 
 
+# 1、安装jdk、maven
+
+# 2、以war包方式安装jenkins
+
+# 3、下载插件-解决网络问题
+
+# 4、注意插件版本与jenkins问题
+
+
+
+
+
+# 插件下载-国内网络问题解决
+
 
 
 **2.277.3**
@@ -60,10 +74,6 @@ sed -i 's/https:\/\/updates.jenkins.io\/download/http:\/\/mirrors.tuna.tsinghua.
 jenkins这些源有点坑，下载的default.json里面还是重定向到官方地址，，所以，需要我们手动去替换成我们设置的源的下载地址。
 
 还有一种方式就是为jenkins设置 nginx代理，将官方下载地址替换为国内镜像地址。真麻烦。。
-
-
-
-
 
 
 
