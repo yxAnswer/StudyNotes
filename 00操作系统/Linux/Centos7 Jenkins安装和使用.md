@@ -42,6 +42,28 @@
 
 
 
+1、访问ip地址+端口
+
+2、解锁jenkins,获取密码-- 0562ff5005af4a0f8b76aa14fff899da
+
+3、出现离线，--访问插件管理，切换源-清华源--- submit ,点击check now 下载default.json
+
+4、修改default.json文件, 将https换为http,将updates.jenkins.io/download 换为mirrors.tuna.tsinghua.edu.cn/jenkins   不然还是下载的国外
+
+5、重启jenkins.  http://192.168.42.133:9000/restart 
+
+6、安装插件，结果失败了，就跳过
+
+7、创建管理员用户，密码
+
+8、设置实例名jenkins, 保存完成
+
+9、安装插件-- 
+
+汉化、等
+
+
+
 访问插件管理地址""
 
 http://192.168.42.133:9000/pluginManager/advanced
@@ -93,6 +115,12 @@ http://192.168.42.133:9000/restart 后面拼个restart即可重启jenkins
 ## 安装插件记录
 
 直接安装git可能会因为依赖版本问题，所以就一个个的装，去官网看支持的最低jenkins版本。
+
+安装汉化包：
+
+localization-zh-cn.hpi
+
+trilead-api.hpi
 
 安装git：
 

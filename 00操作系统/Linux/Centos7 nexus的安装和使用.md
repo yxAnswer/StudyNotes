@@ -1,6 +1,6 @@
 [toc]
 
-# Centos7  nexus私服的安装
+# Centos7 下nexus的安装和使用
 
 ## 1、安装JDK
 

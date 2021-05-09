@@ -1,4 +1,4 @@
-# linux 使用yum 安装mysql
+# Centos7 使用yum 安装mysql
 
 [toc]
 
@@ -8,12 +8,12 @@
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20190326151953754.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTExMzgxOTA=,size_16,color_FFFFFF,t_70)
 如图，目前的版本已经到8了，我们先把yum源下载下来，并且导入到linux服务器目录下。
 
-然后我们执行`rpm -ivh mysql80-community-release-el7-2.noarch.rpm`
+然后我们执行`rpm -ivh mysql80-community-release-el7-3.noarch.rpm`
 
 **当然还有一种方式**，就是我们直接在线下载：直接安装自己需要的版本
 
 ```
-wget http://repo.mysql.com/mysql-community-release-el7-5.noarch.rpm
+wget http://repo.mysql.com/mysql80-community-release-el7-3.noarch.rpm
 rpm -ivh mysql-community-release-el7-5.noarch.rpm
 ```
 
@@ -132,23 +132,38 @@ rpm -qa | grep mariadb
 rpm -e --nodeps mariadb-libs-5.5.68-1.el7.x86_64
 ```
 
-
-
 ### 3.2 安装
 
 安装之前如果没有更新yum 的最好更新下
 
-更新：`yum upgrade`
+```shell
+yum upgrade   #更新软件源
+yum install mysql-community-server #安装mysql
+```
 
-安装：`yum install mysql-community-server`
+添加一个用户，专门负责mysql：
 
-权限设置：`chown mysql:mysql -R /var/lib/mysql`       因为数据库文件在这，需要给权限,这里创建了mysql这个用户以及mysql组，
+```shell
+useradd mysql #新增mysql用户
+passwd mysql  #设置密码
+```
+
+权限设置：
+
+因为数据库文件在这，需要给权限,这里创建了mysql这个用户以及mysql组，
+
+```shell
+chown mysql:mysql -R /var/lib/mysql
+```
 
 然后设置可写权限：`chmod -R 777 /var/lib/mysql`  不然innodb报错
 
-初始化mysql:`mysqld --initialize`
+初始化并启动mysql:
 
-启动mysql: `systemctl start mysqld.service`
+```shell
+mysqld --initialize  #初始化
+systemctl start mysqld.service  #启动
+```
 
 查看mysql 运行状态：
 
@@ -189,7 +204,7 @@ mysql5.7安装后会生成一个默认密码，如果直接登录可能报错。
 
 可能出现： 
 
-ERROR 1045 (28000): Access denied for user 'root'@'localhost' (using password: NO)，因为mysql5.7给root用户默认创建了一个密码，存在log日志里面，执行下面命令找出。
+`ERROR 1045 (28000): Access denied for user 'root'@'localhost' (using password: NO)`，因为mysql5.7给root用户默认创建了一个密码，存在log日志里面，执行下面命令找出。
 
 ```shell
 grep "temporary password" /var/log/mysqld.log 
@@ -212,15 +227,23 @@ alter user 'root'@'localhost' identified by 'Root_11'; #密码有规则，太简
 或set password for 'root'@'localhost'=password('Root_11');
 ```
 
+如果出现密码强度不够：`ERROR 1819 (HY000): Your password does not satisfy the current policy requirements`:
 
+```shell
+#密码的长度是由validate_password_length决定的,但是可以通过以下命令修改
+set global validate_password_length=4;
+#validate_password_policy决定密码的验证策略,默认等级为MEDIUM(中等),可通过以下命令修改为LOW(低)
+set global validate_password_policy=0;
+```
+
+
+修改完成后密码就可以设置的很简单，比如123456。
 
 ### 4.2 添加账号，设置权限
 
 我们默认是用的root权限，如果不想直接用root这个账号远程操作数据库，需要我们手动创建一个账号。
 
-（1）登录mysql ,这里我们已经登录了
-
-没密码用mysql,有密码用 mysql -u root -p 
+（1）登录mysql ,  mysql -u root -p 
 
 （2）创建账号admin,并将密码设为123456，设置访问权限。
 
@@ -228,7 +251,7 @@ alter user 'root'@'localhost' identified by 'Root_11'; #密码有规则，太简
 
 %代表任何客户机都可以连接,localhost代表只可以本机连接
 
-当然可以分步，比如我们
+当然可以分步，比如:
 
 `grant all on *.* to admin@'localhost' identified by '123456';`
 
@@ -281,4 +304,157 @@ mysql> select user,host from user where user='admin';
 
 这个这里就不贴图了，登录自己的阿里云服务器，进入安全组——添加规则——添加mysql协议，默认为3306，授权对象设为 0.0.0.0/0 就可以了。然后用sqlyog或者Navicat试一下。
 
-如果还不行：多半是防火墙的问题，请自行百度+google 很多哈哈哈哈哈哈。
+如果还不行：多半是防火墙的问题，请自行百度+google 很多。
+
+以虚拟机为例，开放3306端口：
+
+```shell
+#开放3306端口
+firewall-cmd --zone=public --add-port=3306/tcp --permanent   
+#重启防火墙
+firewall-cmd --reload
+#查看端口号是否开启
+firewall-cmd --query-port=3306/tcp
+#查看所有打开的端口
+firewall-cmd --zone=public --list-ports
+```
+
+如果没有装防火墙，需要重新设置下（可选，不同情况不一样，保证firewall-cmd可用即可）：
+
+```shell
+yum install firewalld systemd -y #安装防火墙
+systemctl start  firewalld.service #开启防火墙
+
+yum install -y curl policycoreutils-python openssh-server perl #安装ssh协议
+#如果报错，重建数据库
+rpm --rebuilddb && yum install -y curl policycoreutils-python openssh-server perl 
+
+systemctl enable sshd #设置ssh服务开机启动
+systemctl start sshd #启动ssh服务
+firewall-cmd --permanent --add-service=http #添加http服务到firewalld
+firewall-cmd --permanent --add-service=https #添加HTTPS服务到firewalld
+systemctl reload firewalld #重启防火墙
+```
+
+## 6、设置开机启动
+
+- 在`etc/systemd/system `  下面创建mysqld.service 文件
+
+  ```shell
+  [root@localhost system]# touch /etc/systemd/system/mysqld.service
+  [root@localhost system]# cd /etc/systemd/system
+  ```
+
+- 编辑mysqld.service文件,加入下面内容，保存退出
+
+  ```shell
+  [root@localhost system]# vim mysqld.service
+  
+  [Unit]
+  Description=MySQL Server
+  Documentation=man:mysqld(8)
+  Documentation=http://dev.mysql.com/doc/refman/en/using-systemd.html
+  After=network.target
+  After=syslog.target
+  
+  [Install]
+  WantedBy=multi-user.target
+  
+  [Service]
+  User=mysql
+  Group=mysql
+  ExecStart=/usr/sbin/mysqld --defaults-file=/etc/my.cnf
+  LimitNOFILE = 5000
+  ```
+
+- ExecStart=/usr/sbin/mysqld  (这里根据实际情况修改，本机mysql的安装路径)，使用 `which mysqld`命令可查看
+
+  ```shell
+  [root@localhost system]# which mysqld
+  /usr/sbin/mysqld
+  ```
+
+- 设置开启自启动
+
+  ```shell
+  systemctl enable mysqld #设置开启自启动
+  systemctl start mysqld  #现在启动mysql服务
+  ```
+
+- `systemctl enable mysqld`执行后出现（Created symlink from ......）表示加入开机自启成功。如果出错提示已经有了mysql.service ,
+
+## 7、mysql管理常见linux命令
+
+### 7.1.启动命令
+
+```shell
+[root@localhost usr]#  service mysqld start
+Redirecting to /bin/systemctl start mysqld.service
+```
+
+### 7.2.关闭命令
+
+```shell
+[root@localhost usr]# service mysqld stop
+Redirecting to /bin/systemctl stop mysqld.service
+```
+
+### 7.3.重启命令
+
+```shell
+[root@localhost usr]# service mysqld restart
+Redirecting to /bin/systemctl restart mysqld.service
+```
+
+### 7.4.查看服务状态
+
+```shell
+[root@localhost usr]# service mysqld status
+Redirecting to /bin/systemctl status mysqld.service
+
+● mysqld.service - MySQL Server
+   Loaded: loaded (/etc/systemd/system/mysqld.service; enabled; vendor preset: disabled)
+   Active: active (running) since 六 2021-05-08 18:01:03 CST; 5h 6min ago
+     Docs: man:mysqld(8)
+           http://dev.mysql.com/doc/refman/en/using-systemd.html
+ Main PID: 3332 (mysqld)
+   CGroup: /system.slice/mysqld.service
+           └─3332 /usr/sbin/mysqld --defaults-file=/etc/my.cnf
+
+5月 08 18:01:03 localhost.localdomain systemd[1]: Started MySQL Server.
+```
+
+### 7.5.查看MySql系统配置
+
+```shell
+[root@localhost usr]# cat /etc/my.cnf
+# For advice on how to change settings please see
+# http://dev.mysql.com/doc/refman/5.7/en/server-configuration-defaults.html
+
+[mysqld]
+max_allowed_packet=1024M
+#
+# Remove leading # and set to the amount of RAM for the most important data
+# cache in MySQL. Start at 70% of total RAM for dedicated server, else 10%.
+# innodb_buffer_pool_size = 128M
+#
+# Remove leading # to turn on a very important data integrity option: logging
+# changes to the binary log between backups.
+# log_bin
+#
+# Remove leading # to set options mainly useful for reporting servers.
+# The server defaults are faster for transactions and fast SELECTs.
+# Adjust sizes as needed, experiment to find the optimal values.
+# join_buffer_size = 128M
+# sort_buffer_size = 2M
+# read_rnd_buffer_size = 2M
+datadir=/var/lib/mysql
+socket=/var/lib/mysql/mysql.sock
+
+# Disabling symbolic-links is recommended to prevent assorted security risks
+symbolic-links=0
+
+log-error=/var/log/mysqld.log
+pid-file=/var/run/mysqld/mysqld.pid
+```
+

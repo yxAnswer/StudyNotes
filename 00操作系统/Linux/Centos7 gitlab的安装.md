@@ -1,3 +1,5 @@
+[toc]
+
 # Centos7  gitlab的安装
 
 ## 1、切换国内的源
@@ -69,7 +71,7 @@ yum install -y curl policycoreutils-python openssh-server perl #安装ssh协议
 
 systemctl enable sshd #设置ssh服务开机启动
 systemctl start sshd #启动ssh服务
-firewall-cmd --permanent --add-service=http #添加http服务都firewalld
+firewall-cmd --permanent --add-service=http #添加http服务到firewalld
 firewall-cmd --permanent --add-service=https #添加HTTPS服务到firewalld
 systemctl reload firewalld #重启防火墙
 
@@ -108,7 +110,7 @@ yum install -y gitlab-ce
 gitlab-ctl reconfigure # 自动配置(可选)，当然也可以全部修改完以后再执行，执行完就可以访问网站了
 
 vim /etc/gitlab/gitlab.rb # 修改
-修改external_url为gitlab机子的ip+要使用的端口 如：http://192.168.1.141:8888 
+修改external_url   为gitlab所在服务器的ip+要使用的端口 如：http://192.168.1.141:8888 
 修改nginx['listen_port'] = 8888 
 修改时区gitlab_rails['time_zone'] = 'Asia/Shanghai'
 重新配置gitlab并重启 
@@ -134,6 +136,8 @@ firewall-cmd --zone=public --add-port=8888/tcp --permanent
 firewall-cmd --reload
 #查看端口号是否开启
 firewall-cmd --query-port=8888/tcp
+#查看所有打开的端口
+firewall-cmd --zone=public --list-ports
 
 ```
 

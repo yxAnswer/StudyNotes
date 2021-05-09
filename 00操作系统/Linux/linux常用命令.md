@@ -297,6 +297,8 @@ ip addr 也可以查看ip信息
 `-p` ：指明显示建立相关连接的程序名
 安装netstat命令：`yum -y install net-tools  `
 
+`netstat -lnp|grep 9000 #查看端口占用`
+
 ### top命令
 
 **功能说明：监控Linux系统状况，比如cpu、内存的使用**
