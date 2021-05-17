@@ -1,3 +1,5 @@
+
+
 # Centos7安装配置 Jenkins 2.282 
 
 [toc]
@@ -287,148 +289,141 @@ ln -s /usr/local/git_2.9.5/bin/git /usr/bin/git
 
 
 
-## 5、系统配置：jdk,maven，gitlab,sonarqube
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210517212403754.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTExMzgxOTA=,size_16,color_FFFFFF,t_70)
 
-## 6、手动构建编译发布测试
-
-## 7、配置gitlab webhooks自动构建
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210517212656289.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTExMzgxOTA=,size_16,color_FFFFFF,t_70)
 
 
 
-# 二、出现问题记录
+在系统管理——插件管理中搜索我们需要的插件，进行下载。如何下载失败，可能有以下原因
 
-### 4、注意插件版本与jenkins问题
+- 网络太差，由于jenkins插件地址都是从国外网站下载
 
+  解决办法：1、代理2、手动下载完导入3、配国内源
 
+- 插件依赖的其他插件部分下载失败
 
-# 插件下载-国内网络问题解决
+  解决办法：将插件的依赖插件一个个装好再去装此插件，可以使用手动导入方式
 
+- 插件和jenkins版本不匹配，不支持当前版本
 
+  解决办法：升级jenkins版本或者找其他插件替代
 
-1、访问ip地址+端口
+- 插件和已经下载的插件版本不匹配，需要升级对应插件
 
-2、解锁jenkins,获取密码-- 0562ff5005af4a0f8b76aa14fff899da
+  解决办法：升级已安装插件，去官网看支持版本
 
-3、出现离线，--访问插件管理，切换源-清华源--- submit ,点击check now 下载default.json
+对于由于网络问题无法下载，我们可以这样解决：
 
-4、修改default.json文件, 将https换为http,将updates.jenkins.io/download 换为mirrors.tuna.tsinghua.edu.cn/jenkins   不然还是下载的国外
+### 4.1、手动下载，然后进行安装上传
 
-5、重启jenkins.  http://192.168.42.133:9000/restart 
+下载地址：[https://plugins.jenkins.io/](https://plugins.jenkins.io/)
 
-6、安装插件，结果失败了，就跳过
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210508175320906.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTExMzgxOTA=,size_16,color_FFFFFF,t_70)
 
-7、创建管理员用户，密码
+搜索需要安装的插件以及子插件，导入jenkins。比如：
 
-8、设置实例名jenkins, 保存完成
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210508175449837.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTExMzgxOTA=,size_16,color_FFFFFF,t_70)
 
-9、安装插件-- 
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210508175350577.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTExMzgxOTA=,size_16,color_FFFFFF,t_70)
 
-汉化、等
+然后就是，缺什么下载什么，按照依赖顺序安装。
 
+### 4.2 配置国内源，提高下载速度
 
+【详细的Jenkins的镜像地址查询：http://mirrors.jenkins-ci.org/status.html】
 
-访问插件管理地址""
+打开插件管理——>高级或者直接访问http://xxxxxx:9010/pluginManager/advanced  
 
-http://192.168.42.133:9000/pluginManager/advanced
+将 https://updates.jenkins.io/update-center.json 替换为：
 
-原来的url:  https://updates.jenkins.io/update-center.json
+http://mirrors.tuna.tsinghua.edu.cn/jenkins/updates/update-center.json ，点击立即获取。
 
-替换国内的源，不然有可能下载插件特别慢和超时。
+此操作将会从url网站下载并存储到default.json文件下，位于/root/.jenkins/updates 目录下。
 
-http://mirror.esuni.jp/jenkins/updates/update-center.json
+但是不幸的是，这时候点击下载插件还是失败：为什么呢？
 
+jenkins这些源有点坑，下载的default.json里面还是重定向到官方地址，根本没有做到完全走国内的网络，大家可以打开default.json查看下，还都是以updates.jenkins.io开头的网址。怎么解决呢？
 
-
-http://mirrors.tuna.tsinghua.edu.cn/jenkins/updates/update-center.json
-
-修改default.json文件
+- nginx代理方式，讲所有请求转换为国内源地址（不过这个我没有成功，可能是我虚拟机的问题）
+- 手动替换的方式（我是选择的这种方式，并将命令写到脚本，需要时执行一下）
 
 ```shell
 #进入jenkins的工作目录下的updates
 cd /root/.jenkins/updates  
-
-#里面有个default.json ,替换它的内容
-sed -i 's/https:\/\/updates.jenkins.io\/download/http:\/\/mirror.esuni.jp\/jenkins/g' default.json && sed -i 's/http:\/\/www.google.com/http:\/\/www.baidu.com/g' default.json
-
 #清华源  里面有个default.json ,替换它的内容
 sed -i 's/https:\/\/updates.jenkins.io\/download/http:\/\/mirrors.tuna.tsinghua.edu.cn\/jenkins/g' default.json && sed -i 's/http:\/\/www.google.com/http:\/\/www.baidu.com/g' default.json
 ```
 
-好像还不行：换个源
-
-jenkins这些源有点坑，下载的default.json里面还是重定向到官方地址，，所以，需要我们手动去替换成我们设置的源的下载地址。
-
-还有一种方式就是为jenkins设置 nginx代理，将官方下载地址替换为国内镜像地址。真麻烦。。
+直接简单粗暴将请求地址替换掉，重启，安装插件试一下。如果不行，换个其他源。（注意这里替换完就不要点击check now(立即获取) 按钮了，因为会覆盖掉，如果点了就需要重新执行下脚本）
 
 
 
-【详细的Jenkins的镜像地址查询：http://mirrors.jenkins-ci.org/status.html】
+## 5、系统配置：jdk,maven，sonarqube,邮件
 
+### 5.1 配置jdk
 
-http://192.168.42.133:9000/restart 后面拼个restart即可重启jenkins
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210509223450518.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTExMzgxOTA=,size_16,color_FFFFFF,t_70)
 
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210509223541333.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTExMzgxOTA=,size_16,color_FFFFFF,t_70)
 
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210509223809419.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTExMzgxOTA=,size_16,color_FFFFFF,t_70)
 
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20210425105128913.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTExMzgxOTA=,size_16,color_FFFFFF,t_70)
+### 5.2 配置maven
 
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210509224323752.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTExMzgxOTA=,size_16,color_FFFFFF,t_70)
 
+### 5.3 配置sonarqube(可选)
 
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210509224752179.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTExMzgxOTA=,size_16,color_FFFFFF,t_70)
 
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210509230101805.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTExMzgxOTA=,size_16,color_FFFFFF,t_70)
 
-## 安装插件记录
+我们需要新建一个凭证用来链接sonarqube服务器。
 
-直接安装git可能会因为依赖版本问题，所以就一个个的装，去官网看支持的最低jenkins版本。
+进入sonarqube平台，点击配置、权限、用户，生成令牌。
 
-安装汉化包：
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210509230406638.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTExMzgxOTA=,size_16,color_FFFFFF,t_70)
 
-localization-zh-cn.hpi
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210509230552339.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTExMzgxOTA=,size_16,color_FFFFFF,t_70)
 
-trilead-api.hpi
+回到jenkins界面，讲令牌写入，创建凭证，然后选择保存即可。
 
-安装git：
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210517223847526.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTExMzgxOTA=,size_16,color_FFFFFF,t_70)
 
--  SSH Credentials  1.18.2
--  git-client 3.7.1
--  git 4.7.1
+接下来配置sonarqube sanner ,进入全局工具配置：
 
-安装maven：构建工具
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210509223450518.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTExMzgxOTA=,size_16,color_FFFFFF,t_70)
 
-- Maven Integration 3.10
+找到SonarQube Scanner安装它。
 
-安装sonarqube scanner:代码质量管理
-
-- SonarQube Scanner
-
-发布插件：发布到远程服务器
-
-- Publish Over CIFS 
-- Publish Over FTP
-- Publish Over SSH
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210509231006859.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTExMzgxOTA=,size_16,color_FFFFFF,t_70)
 
 
 
-系统配置
-系统管理--》全局工具配置 
+### 5.4邮件配置
 
-- 1.配置jdk 
+在配置邮件之前，我们选择的是qq邮箱，因为163邮箱发几次就不能发了。 如果要配置我们需要获取授权码，如下：
 
-- 2.配置maven 
+![在这里插入图片描述](https://img-blog.csdnimg.cn/2021050923185675.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTExMzgxOTA=,size_16,color_FFFFFF,t_70)
 
-- 3.配置sonar 
+**jenkins配置邮件通知流程：**
 
-  1、配置sonarqube服务器，系统管理-系统设置-sonar server ,配置服务器名称和令牌
+系统管理——>系统设置——>邮件通知-——>smtp服务器 smtp.qq.com -——>用户默认邮件后缀 @qq.com——>勾选使用SMTP认证——>输入邮箱和授权码 -——>勾选ssl协议——>输入SMTP端口465 ， Reply-To Address发件者邮箱   ——> 之后测试一下配置，无误即可  
 
-  2、配置sonarqube scanner
 
-- 4.邮件配置  zmwg yfyi llzw bahe  qq邮箱授权码
 
-  系统管理——>系统设置——>邮件通知-——>smtp服务器 smtp.qq.com -——>用户默认邮件后缀 @qq.com——>勾选使用SMTP认证——>输入邮箱和授权码 -——>勾选ssl协议——>输入SMTP端口465 ， Reply-To Address发件者邮箱   ——> 之后测试一下配置，无误即可  
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210509232612621.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTExMzgxOTA=,size_16,color_FFFFFF,t_70)
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210509232837626.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTExMzgxOTA=,size_16,color_FFFFFF,t_70)
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210509233019459.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTExMzgxOTA=,size_16,color_FFFFFF,t_70)
 
-- 配置gitlab授权
+然后再点击测试发件，成功了 Email was successfully sent
 
-  Credentials--》system--》Global credentials
+## 6、配置gitlab,手动构建编译发布
 
-这里，生成密钥，会在home目录生成.ssh目录及密钥 id_rsa 和id_rsa.pub。
+### 6.1 生成一个密钥对用于鉴权
+
+这里，生成密钥，会在home目录生成.ssh目录及密钥 id_rsa （私钥）和id_rsa.pub（公钥）。
 
 ```shell
 [root@localhost ~]# ssh-keygen -t rsa
@@ -473,76 +468,94 @@ O/5Nj8PmhdCtI4oh2E5++gCjbNz4xTJut2Qj69JeKRY4EqBLVlZklvF8imYn3DaKdqWKVABHOuCinaSP
 lhost.localdomain
 ```
 
-- 在jenkins新建任务，配置源码管理git,配置 gitlab仓库的ssh地址，配置ssh的私钥凭证。 
+### 6.2 创建用于连接gitlab的凭证
 
-配置jdk,maven
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210509233901935.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTExMzgxOTA=,size_16,color_FFFFFF,t_70)
 
-echo  $JAVA_HOME  查看java安装目录
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210509233921895.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTExMzgxOTA=,size_16,color_FFFFFF,t_70)
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210510102726938.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTExMzgxOTA=,size_16,color_FFFFFF,t_70)
 
+![在这里插入图片描述](https://img-blog.csdnimg.cn/2021051010280068.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTExMzgxOTA=,size_16,color_FFFFFF,t_70)
 
+启动jenkins的用户，自动获取名，这里是root
 
-9faa142aaff7d4cc76e91d3712e810cef525f7dd        jenkins   sonarqube 令牌
+### 6.3 新建任务配置gitlab
 
+在jenkins新建任务，配置源码管理git,配置 gitlab仓库的ssh地址，配置ssh的私钥凭证。 
+新建任务：
 
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210510102116884.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTExMzgxOTA=,size_16,color_FFFFFF,t_70)
 
---------
+配置gitlab地址和凭证：
 
-在应用服务器上，运行我们的项目。
-
-```shell
-nohup java -jar jenkinsdemo-0.0.1-SNAPSHOT.jar > /dev/null 2>&1 &
-#后台守护进程运行jar， 不管正确还是错误的输出都重定向/dev/null也就是控设备。 
-```
-
-- nohup 守护进程方式运行
-- /dev/null 表示空设备文件
-- 0 表示stdin标准输入
-- 1 表示stdout标准输出
-- 2 表示stderr标准错误
-- 最后的& 表示后台运行
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210510102310429.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTExMzgxOTA=,size_16,color_FFFFFF,t_70)
 
 
 
-### window服务器安装 powerhell server 使用ssh
+前往gitlab仓库地址，配置ssh keys,将我们对jenkins生成秘钥的公钥配置给制定仓库。
 
-- powershell server 配置，并且配置公钥
-- jenkins服务器 系统设置配置ssh服务器，配置私钥
-- 添加ssh服务器，windows服务器的地址。 
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210510095419587.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTExMzgxOTA=,size_16,color_FFFFFF,t_70)
 
+可以指定我们要构建的分支：
 
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210517225845287.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTExMzgxOTA=,size_16,color_FFFFFF,t_70)
 
-构件任务，发布到windows服务器，并启动jar包。
+### 6.4 配置自动构建部署
 
+首先配置我们要部署的服务器地址：点击系统管理——>系统设置——>找到Publish over ssh ，当然如果使用其他方式另说。
 
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210517231841688.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTExMzgxOTA=,size_16,color_FFFFFF,t_70)
 
+配置完服务器地址，进入我们创建的任务页面，配置构建环境：
 
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210517232713603.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTExMzgxOTA=,size_16,color_FFFFFF,t_70)
 
-# 构建后发送到sonarqube
+添加构建完成后操作，点击 add post build step: 通过ssh选择发送文件或执行脚本
 
-Excute SonarQube Scanner;
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210517230725434.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTExMzgxOTA=,size_16,color_FFFFFF,t_70)
 
+这里选择我们刚才创建的服务器名称：
 
-
-sonarqube整合
-sonar.projectKey=xdclass
-sonar.projectName=xdclass
-sonar.projectVersion=1.0
-sonar.sourceEncoding=UTF-8
-sonar.modules=java-module
-\# Java module
-java-module.sonar.projectName=test
-java-module.sonar.language=java
-\# .表示projectBaseDir指定的目录
-java-module.sonar.sources=src
-java-module.sonar.projectBaseDir=.
-java-module.sonar.java.binaries=target/  
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210517230507237.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTExMzgxOTA=,size_16,color_FFFFFF,t_70)
 
 
 
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210517230643409.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTExMzgxOTA=,size_16,color_FFFFFF,t_70)
 
 
 
+保存后，点击立即构建。不出意外，就成功了。当然，意外总是有的
 
-# 设置webhook,配置gitlab,提交代码自动构件
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210517230105215.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTExMzgxOTA=,size_16,color_FFFFFF,t_70)
 
-- 安装插件GitLab
+
+
+构建后，会先从gitlab仓库拉取代码，然后用我们配置的maven ，jdk进行构建打包，然后讲jar包通过ssh服务发送到目标服务器，然后执行构建脚本，启动服务。 我们可以通过页面点击去查看命令行输出，
+
+- 如果拉取代码环节失败了，检查gitlab配置
+- 如果打包环节失败了。查看maven配置及命令
+- 如果发送成功，但是执行脚本失败了。那就得好好看看脚本内容了，这一步有很多坑。
+
+### 6.5 window服务器如何使用ssh
+
+如果我们的目标服务器是windows,那么我们还要用 ssh的方式将jar包发送到服务器目录，并且远程执行脚本，就需要我们的windows服务器开启ssh服务，这个有很多种方式，我选择在服务器上安装 powerShellServer这个软件，手动起一个ssh服务。 当然直接命令行安装openssh并开启ssh服务也可以，但是我试过有的服务器执行脚本不能执行call ,只能执行start，这让我很郁闷，所以就选择了powerShellServer。
+
+参考文章：
+
+[windows服务器里实现通过ssh工具SecureCRT](https://blog.csdn.net/achenyuan/article/details/81166526)
+
+[Jenkins连接Window服务器，上传jar并启动](https://blog.csdn.net/achenyuan/article/details/81181347)
+
+基本思路：
+
+- 安装powershell server 
+- 配置powershell server 
+- 远程通过ssh连接
+
+## 7、配置gitlab webhooks自动构建
+
+
+
+# 二、出现问题记录
+
+
