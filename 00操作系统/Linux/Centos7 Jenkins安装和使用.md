@@ -4,20 +4,6 @@
 
 [toc]
 
-- 官网下载最新的war包
-- 上传到服务器
-- nohup java -jar jenkins.war --httpProt=9000 >msg.log &   守护进程启动
-- 开放9000 防火墙端口
-- 访问网址 管理员登录
-- 创建账户
-- 修改下载的源，设置为国内
-- 修改default.json的 路径，替换为源。  或者设置nginx代理
-- 下载插件
-
-[https://www.jenkins.io/download/](https://www.jenkins.io/download/)
-
-
-
 # 一、Jenkins安装、配置
 
 ## 1、安装jdk、maven、git
@@ -554,8 +540,67 @@ lhost.localdomain
 
 ## 7、配置gitlab webhooks自动构建
 
+现在我们要实现的是：开发人员提交代码到gitlab，由gitlab通过webhook触发jenkins的构建任务，编译打包发布。
+
+### 7.1 jenkins配置
+
+首先：安装gitlab插件，这个上面讲插件部分已经说过了。
+
+![image-20210518223721328](C:\Users\Answer\AppData\Roaming\Typora\typora-user-images\image-20210518223721328.png)
+
+要特别注意，这里有个url,`http://xxxxxx:9010/project/jenkinsdemo`  正常情况下这个路径应该是当前创建的这个任务的地址，也就是jenkins配置的这个项目地址，但是我拿这个去访问根本访问不到怎么回事？为了这个问题查了很多资料，搞了半天没搞懂，为什么自动生成的路径和项目实际路径不符合呢？
+
+项目实际路径：`http://xxxxxx:9010/job/jenkinsdemo` ，我就日了狗了，为啥一个是job,一个是project呢，
+
+这让我百思不得其解。不管了，继续。
+
+### 7.2配置gitlab
+
+首先使用管理员账号，打开允许Webhook和服务队本地网络的请求设置，如下：
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210518222628994.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTExMzgxOTA=,size_16,color_FFFFFF,t_70)
+
+
+
+进入对应代码库，设置webhook ：
+
+![image-20210518224338449](C:\Users\Answer\AppData\Roaming\Typora\typora-user-images\image-20210518224338449.png)
+
+
+
+![image-20210518224553552](C:\Users\Answer\AppData\Roaming\Typora\typora-user-images\image-20210518224553552.png)
+
+这样最终：gitlab网址配的是：`http://xxxxxx:9010/job/jenkinsdemo` 这个真实地址，不是那个自动生成的地址，然后配上生成的token，点击测试，如果返回200 ok,说明这个webhook已经通了。
+
+
+
 
 
 # 二、出现问题记录
+
+- 插件无法下载的问题
+- 版本冲突的问题
+- gitlab 无法正常使用webhook的问题
+- CRFS跨站请求伪造的问题，导致无法使用webhook
+
+下面简单说下，如何解决高版本无法关闭CRFS设置的问题，Jenkins版本自2.204.6以来的重大变更有：删除禁用 CSRF 保护的功能。 
+
+老版本：直接在系统管理——>全局安全配置中关闭即可。
+
+新版本：配置启动参数：
+
+- war包方式直接启动，添加如下参数
+
+  ```shell
+  java -Dhudson.security.csrf.GlobalCrumbIssuerConfiguration.DISABLE_CSRF_PROTECTION=true -jar   xxxx.jar
+  ```
+
+- 其他的比如tomcat或k8s 等在启动参数里面加上它即可。
+
+重启，就会看到CRFS关闭了。
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210518225744447.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTExMzgxOTA=,size_16,color_FFFFFF,t_70)
+
+
 
 
