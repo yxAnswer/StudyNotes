@@ -574,6 +574,8 @@ lhost.localdomain
 
 
 
+## 8、pipeline和blue ocean
+
 
 
 # 二、出现问题记录
@@ -600,7 +602,6 @@ lhost.localdomain
 重启，就会看到CRFS关闭了。
 
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20210518225744447.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTExMzgxOTA=,size_16,color_FFFFFF,t_70)
-
 
 
 
