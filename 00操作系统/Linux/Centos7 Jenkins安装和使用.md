@@ -546,7 +546,7 @@ lhost.localdomain
 
 首先：安装gitlab插件，这个上面讲插件部分已经说过了。
 
-![image-20210518223721328](C:\Users\Answer\AppData\Roaming\Typora\typora-user-images\image-20210518223721328.png)
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210630164121653.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTExMzgxOTA=,size_16,color_FFFFFF,t_70)
 
 要特别注意，这里有个url,`http://xxxxxx:9010/project/jenkinsdemo`  正常情况下这个路径应该是当前创建的这个任务的地址，也就是jenkins配置的这个项目地址，但是我拿这个去访问根本访问不到怎么回事？为了这个问题查了很多资料，搞了半天没搞懂，为什么自动生成的路径和项目实际路径不符合呢？
 
@@ -564,11 +564,11 @@ lhost.localdomain
 
 进入对应代码库，设置webhook ：
 
-![image-20210518224338449](C:\Users\Answer\AppData\Roaming\Typora\typora-user-images\image-20210518224338449.png)
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210630164056357.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTExMzgxOTA=,size_16,color_FFFFFF,t_70)
 
 
 
-![image-20210518224553552](C:\Users\Answer\AppData\Roaming\Typora\typora-user-images\image-20210518224553552.png)
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210630163951716.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTExMzgxOTA=,size_16,color_FFFFFF,t_70)
 
 这样最终：gitlab网址配的是：`http://xxxxxx:9010/job/jenkinsdemo` 这个真实地址，不是那个自动生成的地址，然后配上生成的token，点击测试，如果返回200 ok,说明这个webhook已经通了。
 
