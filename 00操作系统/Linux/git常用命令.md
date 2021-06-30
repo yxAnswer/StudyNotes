@@ -208,6 +208,7 @@ $ git stash    		#保存工作区，然后去其他分支改bug
 $ git stash list   	#查看存储记录，可以多次git stash就有多条记录
 $ git stash apply  [可以是指定的]   #恢复工作区到上一次保存状态，或者指定某一次
 $ git stash pop  [可以是指定的] #恢复工作区到上一次保存状态，或者指定某一次, 并删除stash记录
+$ git stash drop stash@{0} 可以进行删除
 ```
 
 
