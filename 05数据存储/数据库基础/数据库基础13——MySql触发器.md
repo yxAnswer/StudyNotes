@@ -43,20 +43,20 @@ delimiter：
 mysql默认是以;结束，如果在定义触发器中使用其他字符作为结束标志，保证sql语句后面的；不影响触发器。可以使用delimiter来定义，比如：
 
 ```sql
-delimiter $$ 
+delimiter $$  -- 修改分隔符为$$
 create trigger 触发器名称 after/before insert/update/delete on 表名
 for each row
 begin
 sql语句;
 end
 $$ 
-delimiter ; 
+delimiter ;   -- 恢复分隔符为 ；
 ```
 
 或者：等等自定义字符
 
 ```sql
-delimiter // 
+delimiter //   
 create trigger 触发器名称 after/before insert/update/delete on 表名
 for each row
 begin

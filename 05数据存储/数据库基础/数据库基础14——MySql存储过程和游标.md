@@ -29,7 +29,7 @@ begin
    过程体;
 end
 
-创建存储过程很简单
+#创建存储过程很简单
 ```
 
 例如：
@@ -99,10 +99,10 @@ inout：--既表示调用者向过程传入值，又表示过程向调用者传�
 - 删除存储过程命令：drop procedure 名称  
 
 ```sql
---正常存储过程需要写一写注释，增加可读性
---Name ；订单统计
---参数 ： onumber= order number
---				taxable =0 if not  taxable ,1 if  taxable
+-- 正常存储过程需要写一写注释，增加可读性
+-- Name ；订单统计
+-- 参数 ： onumber= order number
+--              taxable =0 if not  taxable ,1 if  taxable
 --  			ototal =order total
 create procedure ordertotal(
 	in  onumber int,
@@ -111,7 +111,7 @@ create procedure ordertotal(
 
 )
 begin
-	--变量
+	-- 变量
 	declare total decimal(8,2);
 	declare taxrate int default 6;
 	select  Sum(item_price*quantity) from  orderitems where order_num=onumber into total;
