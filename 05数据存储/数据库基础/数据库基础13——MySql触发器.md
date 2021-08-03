@@ -38,6 +38,36 @@ insert/update/delete:它们可以在执行insert、update或delete的过程中�
 for each row:每隔一行执行一次动作
 ```
 
+delimiter：
+
+mysql默认是以;结束，如果在定义触发器中使用其他字符作为结束标志，保证sql语句后面的；不影响触发器。可以使用delimiter来定义，比如：
+
+```sql
+delimiter $$ 
+create trigger 触发器名称 after/before insert/update/delete on 表名
+for each row
+begin
+sql语句;
+end
+$$ 
+delimiter ; 
+```
+
+或者：等等自定义字符
+
+```sql
+delimiter // 
+create trigger 触发器名称 after/before insert/update/delete on 表名
+for each row
+begin
+sql语句;
+end
+// 
+delimiter ; 
+```
+
+
+
 ### 2.2 删除触发器
 
 触发器不能更新或覆盖。为了修改一个触发器，必须先删除它，然后再重新创建。  
