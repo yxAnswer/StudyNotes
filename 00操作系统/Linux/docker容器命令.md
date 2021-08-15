@@ -1,13 +1,15 @@
 # 选择镜像
 
 ```shell
-docker pull ubuntu
+docker pull ubuntu 或者
+docker pull centos:7
 ```
 
 # 创建容器
 
 ```shell
 docker create -ti --privileged --name work -p 10000:80 -p 10001:8888 -v D:\DockerWorkSpace\dockerwork:/root/work -w /root ubuntu bash -l
+
 ```
 
 - -ti 交互模式
@@ -19,6 +21,12 @@ docker create -ti --privileged --name work -p 10000:80 -p 10001:8888 -v D:\Docke
 - -w 容器的工作目录
 - ubuntu 容器基础镜像名称
 - bash -l 启动容器shell进程
+
+```shell
+docker create -ti --privileged --name work -p 10000:80 -p 10001:8888 -v D:\workspace\dockerwork:/root/work -w /root centos7 bash -l
+```
+
+
 
 # 启动容器
 
