@@ -14,7 +14,7 @@
 
 ```
 wget http://repo.mysql.com/mysql80-community-release-el7-3.noarch.rpm
-rpm -ivh mysql-community-release-el7-5.noarch.rpm
+rpm -ivh mysql80-community-release-el7-3.noarch.rpm
 ```
 
 ## 2、修改yum源，设置版本(可选)
