@@ -68,7 +68,7 @@ run  sbin  srv  sys  tmp  usr  var
 ```
 ls 		列出目录内容
 ls -a 	列出所有文件和目录，包括隐藏的
-ls -l	列出详细格式的别彪
+ls -l	列出详细格式的目录
 ll 		ls -l  的快捷方式，相同
 ls -t	用文件和目录的更改时间排序
 ls -r	反向排序
@@ -164,15 +164,66 @@ vim有三种模式：**命令模式**、**编辑模式**、**底行模式**
 
 底行模式： 按键盘的 Esc 键进入退出编辑模式，输入 ：冒号进入底行模式
 
-:wq    保存并退出
+**在底行模式操作：**
 
-:q!   不保存，强制退出
+```shell
+:wq    #保存并退出
+:q!   #不保存，强制退出
+:w #保存不退出
+:q #退出不保存
+set nu #显示行号
+set nonu #不显示行号。
 
-:w 保存不退出
+:! #可以再编辑文本的时候，临时输入命令，比如我们查看ip,:! ip addr，找到ip,然后再回到编辑页面。
 
-:q 退出不保存
+:/ #可以进行查找，比如`:/port` 可以列出所有查找到port的文本，按字母n,可以跳转到下一个查找的记录。shift+n 往上找下一个查找记录。
+
+:3,5s/test/test2/g  #:表示，将3 到5行，test替换成test2 ，g标识如果有多个批量替换。 比如将10-15行的所有java替换成go， `:10,15s/java/go/g`
+
+:%s/word1/word2/g #从第一行到最后一行寻找 word1 字符串，并将该字符串取代为 word2
+n1,n2s/word1/word2/g #n1 与 n2 为数字。在第 n1 与 n2 行之间寻找 word1 这个字符串，并将该字符串取代
+为 word2
+```
+
+**在命令模式操作：**
+
+```shell
+ hjkl #移动光标：h、j、k、l  分别对应，左、下、上、右
+
+ ^ $ #^移动到一行的行首，$ 移动到行尾部  也就是shift+6 和shift+4
+
+ gg  #移动到文档第一行行首
+ G   #移动到文档最后一行行首
+ 10G #移动到第10行，11G移动到11行。
+ x   #删除内容，删除一个字符
+ dd  #删除游标所在的那一整行
+ u   #复原原来的操作
+ v   #选中范围按y即复制
+ p   #粘贴
+```
+
+**如何复制粘贴？**
+
+- 按esc进入命令模式
+- yy  复制一行，p 粘贴。 y$ 复制光标到行位。 3y 复制3行，5y复制5行
+- dd 剪切一行，类似。 u为撤销指令。
+- 按v 进入可视模式，移动光标选中要复制的内容
+- 按y 复制命令进行复制， d是剪切命令
+- 按 p 复制命令进行复制（put）
+
+**可视模式：**
+
+```
+v #可以模式可以按照字符选择
+shift+v  #行模式，可以按行选择，进行删除、复制、粘贴等
+ctrl+v  #块模式，可以按照块选择，进行操作
+```
+
+
 
 ## 5、压缩/解压
+
+### 5.1 tar 命令
 
 linux中的打包文件一般以.tar结尾的，压缩文件一般以.gz结尾。
 
@@ -200,7 +251,47 @@ tar -xvf xxx.tar.gz
 tar -xvf xxx.tar.gz -c /usr/local    解压到指定目录
 ```
 
+### 5.2 使用zip/unzip 压缩解压：
 
+```shell
+#安装zip/unzip
+yum install zip
+yum install unzip
+
+zip -r mydata.zip mydata #把mydata目录压缩为mydata.zip
+unzip mydata.zip -d mydatabak #把mydata.zip解压到mydatabak目录里面
+zip -r abc123.zip abc 123.txt #把abc文件夹和123.txt压缩成为abc123.zip
+unzip wwwroot.zip #把wwwroot.zip直接解压到/home目录里面
+unzip abc\*.zip #把abc12.zip、abc23.zip、abc34.zip同时解压到/home目录里面
+unzip -v wwwroot.zip # 查看wwwroot.zip里面的内容
+unzip -t wwwroot.zip #验证wwwroot.zip是否完整 
+unzip -j wwwroot.zip #把wwwroot.zip里面的所有文件解压到第一级目录
+```
+
+**主要参数**
+
+```
+-c：将解压缩的结果
+-l：显示压缩文件内所包含的文件
+-p：与-c参数类似，会将解压缩的结果显示到屏幕上，但不会执行任何的转换
+-t：检查压缩文件是否正确
+-u：与-f参数类似，但是除了更新现有的文件外，也会将压缩文件中的其它文件解压缩到目录中
+-v：执行是时显示详细的信息
+-z：仅显示压缩文件的备注文字
+-a：对文本文件进行必要的字符转换
+-b：不要对文本文件进行字符转换
+-C：压缩文件中的文件名称区分大小写
+-j：不处理压缩文件中原有的目录路径
+-L：将压缩文件中的全部文件名改为小写
+-M：将输出结果送到``more``程序处理
+-n：解压缩时不要覆盖原有的文件
+-o：不必先询问用户，unzip执行后覆盖原有文件
+-P<密码>：使用zip的密码选项
+-q：执行时不显示任何信息
+-s：将文件名中的空白字符转换为底线字符
+-V：保留VMS的文件版本信息
+-X：解压缩时同时回存文件原来的UID/GID
+```
 
 ## 6、其他常用命令
 
@@ -278,11 +369,25 @@ kill  -进程pid    ,比如 kill -10
 
 ```
 
+### 查看ip及网卡信息
+
+#### 1）ifconfig  查看网卡信息
+
+如果出现centos7未找到 ifconfig命令
+
+```shell
+ls /sbin/ifconfig # 查看是否环境变量没有ifconfig引起
+yum search ifconfig # 如果没有安装，查看匹配ifconfig的包
+========================================================= 匹配：ifconfig =============================
+net-tools.x86_64 : Basic networking tools
+
+yum install install net-tools.x86_64  # 根据搜索结果，安装即可
+ifconfig #查看
+```
 
 
-### ifconfig  查看网卡信息
 
-ip addr 也可以查看ip信息
+#### 2）ip addr 也可以查看ip信息
 
 ### ping 查看网络连接情况
 
@@ -304,10 +409,29 @@ ip addr 也可以查看ip信息
 **功能说明：监控Linux系统状况，比如cpu、内存的使用**
 举 例：按住键盘q退出  
 
-### du命令
+top -s   :使top命令在安全模式中运行。
+
+E 可以切换 内存显示单位 kb Mb gb等
+
+s ：小写s可以制定刷新延迟时间，刷新频率
+
+M: 根据主流内存大小进行排序
+
+P: 根据cpu 百分比大小排序
+
+### du   df命令
 
 **功能说明：统计大小** 
-举 例：du -sh ； du -sm *  
+
+> `df -h`查看系统中文件的使用情况
+>
+> ##### `du -sh *`查看当前目录下各个文件及目录占用空间大小
+>
+> du -s * |sort -nr |head 选出排在前面的10个
+>
+> 
+
+
 
 ### uniq命令
 
@@ -388,6 +512,12 @@ chmod 764 aaa.txt
 ```
 
 
+
+**用户组**
+
+```shell
+chown mysql:mysql -R /usr/local/mysql  # 比如将mysql用户给mysql用户组， 赋给文件夹/usr/local/mysql权限
+```
 
 
 

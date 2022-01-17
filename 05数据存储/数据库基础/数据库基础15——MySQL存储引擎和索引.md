@@ -82,7 +82,7 @@ alter table 表名 engine='MyiSAm';
 - primary key：主键索引
 -  foreign key：外键索引
 - fulltext: 全文索引
-- 组合索引  
+- 组合索引(多列索引)  
 
 ### 2.5 测试表数据脚本
 
@@ -263,10 +263,6 @@ insert into command values('9','停止词','is,not,me,yes,no ...');
   ```
 
 ### 5.3 使用全文索引
-
-
-
-
 
 ## 6、外键约束索引
 
