@@ -521,7 +521,36 @@ chown mysql:mysql -R /usr/local/mysql  # 比如将mysql用户给mysql用户组�
 
 
 
+## 常见问题
 
+```shell
+# Unit firewalld.service could not be found  没有安装防火墙
+Centos7 下默认的防火墙是 Firewall，替代了之前的 iptables，Firewall 有图形界面管理和命令行管理两种方式，本文简要介绍命令 行Firewall 的使用。
+
+#如果提示：Unit firewalld.service could not be found. 说明防火墙没有安装，需要安装
+
+yum install firewalld firewall-config
+3重启、关闭、开启firewalld.service服务
+service firewalld restart 重启
+service firewalld start 开启
+service firewalld stop 关闭
+
+#添加自定义端口
+firewall-cmd --zone=public --permanent --add-port=8010/tcp
+
+#查看firewall服务状态
+systemctl status firewalld.service 
+
+#查看firewall的状态
+firewall-cmd --state
+#查看防火墙规则
+firewall-cmd --list-all 
+#添加服务
+firewall-cmd --permanent --zone=public --add-service=http
+
+#使最新的防火墙规则生效
+firewall-cmd --reload
+```
 
 
 
