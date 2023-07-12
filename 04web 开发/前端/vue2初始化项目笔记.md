@@ -1,4 +1,4 @@
-# Vue-cli 创建项目初始化记录
+# Vue2 创建项目初始化记录
 
 技术选型：vue、vuex、vue-router、elementui、scss、eslint
 
@@ -19,7 +19,9 @@
 # 1、创建项目
 
 - 安装node   http://nodejs.cn/download/  
-- 安装vue-cli3
+- 安装vue-cli  
+- 目前vue-cli 已处于维护状态，现在官方推荐使用 [`create-vue`](https://github.com/vuejs/create-vue) 来创建基于 [Vite](https://cn.vitejs.dev/) 的新项目。 另外请参考 [Vue 3 工具链指南](https://cn.vuejs.org/guide/scaling-up/tooling.html) 以了解最新的工具推荐。
+- vue-cli 官方文档：https://cli.vuejs.org/zh/guide/installation.html
 
 ```shell
 npm install -g @vue/cli
@@ -146,7 +148,7 @@ vue -V
   ? Save this as a preset for future projects? (y/N)     //自己确定
   ```
 
-
+- 如果对于保存的预设不满意，或者以后保存预设多了，想删掉的话。去C:\Users\Administrator\\.vuerc   这个文件里面对应的预设json删掉即可
 
 # 2、初始化配置
 
