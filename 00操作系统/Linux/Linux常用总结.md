@@ -56,7 +56,7 @@ cd /etc/sysconfig/network-scripts  #到此目录进行配置
 [root@localhost network-scripts]# cat ifcfg-eno16777736 
 HWADDR=00:0C:29:E1:26:E1
 TYPE=Ethernet
-BOOTPROTO=dhcp
+BOOTPROTO=static
 DEFROUTE=yes
 PEERDNS=yes
 PEERROUTES=yes
