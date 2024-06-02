@@ -21,6 +21,10 @@
 }
 
 
+//组件内部通过useLoaderData()获取orderLoader返回的数据；
+const data=useLoaderData();
+
+
 function orderLoader({ params }: any) {
   return params.id;
 }
